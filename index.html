@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Canastra">
+    <meta name="description" content="Marcador de pontos para Canastra com reconhecimento de cartas por foto">
+    
+    <title>Canastra Score</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .app {
+            padding: 16px;
+            padding-bottom: 100px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3rem;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .target {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .scoreboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .team-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .team-card.nos {
+            border-color: rgba(233, 69, 96, 0.3);
+        }
+
+        .team-card.eles {
+            border-color: rgba(69, 162, 233, 0.3);
+        }
+
+        .team-card.winner {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .team-name {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+        }
+
+        .team-card.nos .team-name {
+            color: #e94560;
+        }
+
+        .team-card.eles .team-name {
+            color: #45a2e9;
+        }
+
+        .team-score {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .team-card.nos .progress-fill {
+            background: linear-gradient(90deg, #e94560, #ff6b6b);
+        }
+
+        .team-card.eles .progress-fill {
+            background: linear-gradient(90deg, #45a2e9, #6bc5ff);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 18px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 24px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .history-section {
+            background: rgba(255,255,255,0.03);
+            border-radius: 16px;
+            padding: 16px;
+        }
+
+        .history-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            color: #888;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-reset {
+            background: rgba(233, 69, 96, 0.2);
+            border: 1px solid rgba(233, 69, 96, 0.4);
+            color: #e94560;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            display: grid;
+            grid-template-columns: auto 1fr 1fr auto;
+            gap: 12px;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .history-round {
+            background: rgba(255,255,255,0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+
+        .history-score {
+            text-align: center;
+        }
+
+        .history-score.nos {
+            color: #e94560;
+        }
+
+        .history-score.eles {
+            color: #45a2e9;
+        }
+
+        .winner-badge {
+            font-size: 0.6rem;
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 4px;
+        }
+
+        .history-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #888;
+            padding: 6px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover, .btn-icon:active {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+
+        .btn-icon.delete:hover, .btn-icon.delete:active {
+            background: rgba(233, 69, 96, 0.3);
+            color: #e94560;
+        }
+
+        .empty-history {
+            text-align: center;
+            color: #666;
+            padding: 24px;
+            font-size: 0.85rem;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 20px;
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255,255,255,0.1);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .winner-select {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .winner-btn {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid rgba(255,255,255,0.2);
+            background: transparent;
+            color: #888;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .winner-btn.active {
+            border-color: #ffd700;
+            color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .winner-btn:hover:not(.active) {
+            border-color: rgba(255,255,255,0.4);
+            color: #fff;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .input-label.nos {
+            color: #e94560;
+        }
+
+        .input-label.eles {
+            color: #45a2e9;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-family: 'Space Mono', monospace;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .btn-camera {
+            padding: 14px 16px;
+            background: linear-gradient(135deg, #6b5b95 0%, #9b59b6 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+        }
+
+        .btn-camera:hover, .btn-camera:active {
+            transform: scale(1.05);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            padding: 14px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 10px;
+            color: #888;
+            cursor: pointer;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .btn-confirm {
+            flex: 1;
+            padding: 14px;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+        }
+
+        .btn-confirm:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Camera Modal */
+        .camera-container {
+            margin: 16px 0;
+        }
+
+        .file-input-wrapper {
+            text-align: center;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn-upload {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #6b5b95 0%, #9b59b6 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn-upload:hover, .btn-upload:active {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(107, 91, 149, 0.4);
+        }
+
+        .analyzing {
+            text-align: center;
+            padding: 24px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #9b59b6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: rgba(233, 69, 96, 0.1);
+            border: 1px solid rgba(233, 69, 96, 0.3);
+            color: #e94560;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin: 16px 0;
+        }
+
+        .analysis-result {
+            background: rgba(39, 174, 96, 0.1);
+            border: 1px solid rgba(39, 174, 96, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+
+        .result-title {
+            color: #2ecc71;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+        }
+
+        .result-total {
+            grid-column: 1 / -1;
+            background: rgba(39, 174, 96, 0.2);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .result-details {
+            grid-column: 1 / -1;
+            color: #888;
+            font-size: 0.8rem;
+            padding: 8px;
+        }
+
+        /* Winner Overlay */
+        .winner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+
+        .winner-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .winner-text {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.5rem;
+            letter-spacing: 4px;
+            margin-bottom: 16px;
+            animation: winnerPulse 1s infinite;
+            text-align: center;
+        }
+
+        .winner-text.nos {
+            color: #e94560;
+        }
+
+        .winner-text.eles {
+            color: #45a2e9;
+        }
+
+        @keyframes winnerPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .winner-score {
+            font-size: 2rem;
+            margin-bottom: 32px;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            animation: fall 3s linear infinite;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+
+        /* Info text */
+        .info-text {
+            font-size: 0.8rem;
+            color: #888;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+        }
+
+        /* Offline indicator */
+        .offline-indicator {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(233, 69, 96, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            z-index: 3000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .offline-indicator.show {
+            opacity: 1;
+        }
+
+        /* Install prompt */
+        .install-prompt {
+            position: fixed;
+            bottom: 16px;
+            left: 16px;
+            right: 16px;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 3000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .install-prompt.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .install-prompt button {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Space Mono', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="app">
+        <!-- Loading state -->
+        <div style="text-align: center; padding-top: 40vh;">
+            <div class="spinner"></div>
+            <p>Carregando...</p>
+        </div>
+    </div>
+
+    <!-- Offline Indicator -->
+    <div id="offlineIndicator" class="offline-indicator">
+        📴 Sem conexão - Modo offline
+    </div>
+
+    <!-- Install Prompt -->
+    <div id="installPrompt" class="install-prompt">
+        <span>📱 Instalar app?</span>
+        <div>
+            <button onclick="dismissInstall()">Depois</button>
+            <button onclick="installApp()" style="background: rgba(0,0,0,0.2); margin-left: 8px;">Instalar</button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CANASTRA SCORE - PWA VANILLA JS
+        // ============================================
+
+        const TARGET_SCORE = 3000;
+        const WIN_BONUS = 100;
+
+        // Estado do jogo
+        let gameData = {
+            nos: 0,
+            eles: 0,
+            history: [],
+            gameOver: false,
+            winner: null
+        };
+
+        // Estado da UI
+        let currentModal = null;
+        let editingIndex = null;
+        let currentTeam = null;
+        let analysisResult = null;
+
+        // PWA Install
+        let deferredPrompt = null;
+
+        // Carregar dados salvos
+        function loadGame() {
+            const saved = localStorage.getItem('canastra_game');
+            if (saved) {
+                gameData = JSON.parse(saved);
+            }
+        }
+
+        // Salvar dados
+        function saveGame() {
+            localStorage.setItem('canastra_game', JSON.stringify(gameData));
+        }
+
+        // Renderizar app
+        function render() {
+            const nosProgress = Math.min((gameData.nos / TARGET_SCORE) * 100, 100);
+            const elesProgress = Math.min((gameData.eles / TARGET_SCORE) * 100, 100);
+
+            const historyHTML = gameData.history.length === 0 
+                ? '<div class="empty-history">Nenhuma rodada registrada ainda</div>'
+                : gameData.history.map((round, index) => `
+                    <div class="history-item">
+                        <span class="history-round">R${index + 1}</span>
+                        <span class="history-score nos">
+                            +${round.nos}
+                            ${round.winner === 'nos' ? '<span class="winner-badge">BATEU</span>' : ''}
+                        </span>
+                        <span class="history-score eles">
+                            +${round.eles}
+                            ${round.winner === 'eles' ? '<span class="winner-badge">BATEU</span>' : ''}
+                        </span>
+                        <div class="history-actions">
+                            <button class="btn-icon" onclick="openEdit(${index})">✏️</button>
+                            <button class="btn-icon delete" onclick="deleteRound(${index})">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+
+            document.getElementById('app').innerHTML = `
+                <div class="header">
+                    <h1 class="logo">CANASTRA</h1>
+                    <p class="target">Primeiro a ${TARGET_SCORE} pontos vence</p>
+                </div>
+
+                <div class="scoreboard">
+                    <div class="team-card nos ${gameData.winner === 'nos' ? 'winner' : ''}">
+                        <div class="team-name">NÓS</div>
+                        <div class="team-score">${gameData.nos}</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${nosProgress}%"></div>
+                        </div>
+                    </div>
+                    <div class="team-card eles ${gameData.winner === 'eles' ? 'winner' : ''}">
+                        <div class="team-name">ELES</div>
+                        <div class="team-score">${gameData.eles}</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${elesProgress}%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="openScoreModal()" ${gameData.gameOver ? 'disabled' : ''}>
+                    ✚ MARCAR PONTOS
+                </button>
+
+                <div class="history-section">
+                    <div class="history-title">
+                        HISTÓRICO
+                        ${gameData.history.length > 0 ? '<button class="btn-reset" onclick="confirmReset()">NOVO JOGO</button>' : ''}
+                    </div>
+                    <div class="history-list">
+                        ${historyHTML}
+                    </div>
+                </div>
+            `;
+
+            // Winner overlay
+            renderWinnerOverlay();
+        }
+
+        // Winner overlay
+        function renderWinnerOverlay() {
+            let overlay = document.getElementById('winnerOverlay');
+            
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'winnerOverlay';
+                overlay.className = 'winner-overlay';
+                document.body.appendChild(overlay);
+            }
+
+            if (gameData.gameOver) {
+                // Confetti
+                let confettiHTML = '';
+                for (let i = 0; i < 30; i++) {
+                    const colors = ['#e94560', '#45a2e9', '#ffd700', '#2ecc71'];
+                    const color = colors[Math.floor(Math.random() * 4)];
+                    const left = Math.random() * 100;
+                    const delay = Math.random() * 3;
+                    const rotation = Math.random() * 360;
+                    confettiHTML += `<div class="confetti" style="left: ${left}%; background-color: ${color}; animation-delay: ${delay}s; transform: rotate(${rotation}deg);"></div>`;
+                }
+
+                overlay.innerHTML = `
+                    ${confettiHTML}
+                    <div class="winner-text ${gameData.winner}">
+                        🏆 ${gameData.winner === 'nos' ? 'NÓS' : 'ELES'} VENCERAM! 🏆
+                    </div>
+                    <div class="winner-score">
+                        ${gameData.nos} × ${gameData.eles}
+                    </div>
+                    <button class="btn-primary" style="width: auto; padding: 16px 32px;" onclick="resetGame()">
+                        NOVO JOGO
+                    </button>
+                `;
+                overlay.classList.add('active');
+            } else {
+                overlay.classList.remove('active');
+            }
+        }
+
+        // Modal de pontuação
+        function openScoreModal() {
+            currentModal = 'score';
+            showModal(`
+                <h2 class="modal-title">MARCAR RODADA</h2>
+                
+                <p class="info-text">Quem bateu? (+100 pontos)</p>
+                <div class="winner-select">
+                    <button class="winner-btn" id="winnerNos" onclick="selectWinner('nos')">🏆 NÓS</button>
+                    <button class="winner-btn" id="winnerEles" onclick="selectWinner('eles')">🏆 ELES</button>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label nos">PONTOS NÓS (cartas + canastras)</div>
+                    <div class="input-row">
+                        <input type="number" class="input-field" id="nosPoints" placeholder="0" min="0" max="3000" inputmode="numeric">
+                        <button class="btn-camera" onclick="openCamera('nos')">📷</button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label eles">PONTOS ELES (cartas + canastras)</div>
+                    <div class="input-row">
+                        <input type="number" class="input-field" id="elesPoints" placeholder="0" min="0" max="3000" inputmode="numeric">
+                        <button class="btn-camera" onclick="openCamera('eles')">📷</button>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button class="btn-confirm" onclick="confirmRound()">Confirmar</button>
+                </div>
+            `);
+        }
+
+        // Variável para armazenar o ganhador selecionado
+        let selectedWinner = null;
+
+        function selectWinner(team) {
+            if (selectedWinner === team) {
+                selectedWinner = null;
+            } else {
+                selectedWinner = team;
+            }
+            
+            document.getElementById('winnerNos').classList.toggle('active', selectedWinner === 'nos');
+            document.getElementById('winnerEles').classList.toggle('active', selectedWinner === 'eles');
+        }
+
+        function confirmRound() {
+            const nos = parseInt(document.getElementById('nosPoints').value) || 0;
+            const eles = parseInt(document.getElementById('elesPoints').value) || 0;
+            const winBonus = selectedWinner === 'nos' ? WIN_BONUS : 0;
+            const winBonusEles = selectedWinner === 'eles' ? WIN_BONUS : 0;
+
+            const roundData = {
+                id: Date.now(),
+                nos: nos + winBonus,
+                eles: eles + winBonusEles,
+                winner: selectedWinner,
+                timestamp: new Date().toLocaleString('pt-BR')
+            };
+
+            gameData.nos += roundData.nos;
+            gameData.eles += roundData.eles;
+            gameData.history.push(roundData);
+
+            // Verificar vitória
+            checkWinner();
+
+            saveGame();
+            closeModal();
+            selectedWinner = null;
+            render();
+        }
+
+        function checkWinner() {
+            if (!gameData.gameOver) {
+                if (gameData.nos >= TARGET_SCORE) {
+                    gameData.gameOver = true;
+                    gameData.winner = 'nos';
+                } else if (gameData.eles >= TARGET_SCORE) {
+                    gameData.gameOver = true;
+                    gameData.winner = 'eles';
+                }
+            }
+        }
+
+        // Editar rodada
+        function openEdit(index) {
+            editingIndex = index;
+            currentModal = 'edit';
+            const round = gameData.history[index];
+            const winBonus = round.winner === 'nos' ? WIN_BONUS : 0;
+            const winBonusEles = round.winner === 'eles' ? WIN_BONUS : 0;
+            selectedWinner = round.winner;
+
+            showModal(`
+                <h2 class="modal-title">EDITAR RODADA ${index + 1}</h2>
+                
+                <p class="info-text">Quem bateu? (+100 pontos)</p>
+                <div class="winner-select">
+                    <button class="winner-btn ${round.winner === 'nos' ? 'active' : ''}" id="winnerNos" onclick="selectWinner('nos')">🏆 NÓS</button>
+                    <button class="winner-btn ${round.winner === 'eles' ? 'active' : ''}" id="winnerEles" onclick="selectWinner('eles')">🏆 ELES</button>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label nos">PONTOS NÓS</div>
+                    <input type="number" class="input-field" id="nosPoints" value="${round.nos - winBonus}" min="0" max="3000" inputmode="numeric">
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label eles">PONTOS ELES</div>
+                    <input type="number" class="input-field" id="elesPoints" value="${round.eles - winBonusEles}" min="0" max="3000" inputmode="numeric">
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button class="btn-confirm" onclick="saveEdit()">Salvar</button>
+                </div>
+            `);
+        }
+
+        function saveEdit() {
+            const nos = parseInt(document.getElementById('nosPoints').value) || 0;
+            const eles = parseInt(document.getElementById('elesPoints').value) || 0;
+            const winBonus = selectedWinner === 'nos' ? WIN_BONUS : 0;
+            const winBonusEles = selectedWinner === 'eles' ? WIN_BONUS : 0;
+
+            gameData.history[editingIndex] = {
+                ...gameData.history[editingIndex],
+                nos: nos + winBonus,
+                eles: eles + winBonusEles,
+                winner: selectedWinner
+            };
+
+            // Recalcular totais
+            const totals = gameData.history.reduce((acc, r) => ({
+                nos: acc.nos + r.nos,
+                eles: acc.eles + r.eles
+            }), { nos: 0, eles: 0 });
+
+            gameData.nos = totals.nos;
+            gameData.eles = totals.eles;
+            gameData.gameOver = totals.nos >= TARGET_SCORE || totals.eles >= TARGET_SCORE;
+            gameData.winner = totals.nos >= TARGET_SCORE ? 'nos' : (totals.eles >= TARGET_SCORE ? 'eles' : null);
+
+            saveGame();
+            closeModal();
+            selectedWinner = null;
+            editingIndex = null;
+            render();
+        }
+
+        function deleteRound(index) {
+            if (!confirm('Excluir esta rodada?')) return;
+
+            gameData.history.splice(index, 1);
+
+            // Recalcular totais
+            const totals = gameData.history.reduce((acc, r) => ({
+                nos: acc.nos + r.nos,
+                eles: acc.eles + r.eles
+            }), { nos: 0, eles: 0 });
+
+            gameData.nos = totals.nos;
+            gameData.eles = totals.eles;
+            gameData.gameOver = totals.nos >= TARGET_SCORE || totals.eles >= TARGET_SCORE;
+            gameData.winner = totals.nos >= TARGET_SCORE ? 'nos' : (totals.eles >= TARGET_SCORE ? 'eles' : null);
+
+            saveGame();
+            render();
+        }
+
+        // Reset
+        function confirmReset() {
+            if (confirm('Iniciar novo jogo? Todo o histórico será apagado.')) {
+                resetGame();
+            }
+        }
+
+        function resetGame() {
+            gameData = {
+                nos: 0,
+                eles: 0,
+                history: [],
+                gameOver: false,
+                winner: null
+            };
+            saveGame();
+            render();
+        }
+
+        // Câmera / Análise de imagem
+        function openCamera(team) {
+            currentTeam = team;
+            analysisResult = null;
+            currentModal = 'camera';
+
+            showModal(`
+                <h2 class="modal-title">CONTAR CARTAS - ${team === 'nos' ? 'NÓS' : 'ELES'}</h2>
+
+                <div class="camera-container">
+                    <div class="file-input-wrapper">
+                        <input type="file" accept="image/*" capture="environment" id="fileInput" class="file-input" onchange="handleFileSelect(event)">
+                        <button class="btn-upload" onclick="document.getElementById('fileInput').click()">
+                            📷 Tirar Foto / Escolher Imagem
+                        </button>
+                    </div>
+
+                    <p style="text-align: center; font-size: 0.75rem; color: #888; margin-top: 12px;">
+                        Tire uma foto nítida das cartas na mesa.<br>
+                        O reconhecimento requer conexão com internet.
+                    </p>
+
+                    <div id="cameraError"></div>
+                    <div id="analysisResult"></div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button class="btn-confirm" id="btnApplyResult" style="display: none;" onclick="applyAnalysisResult()">Usar pontos</button>
+                </div>
+            `);
+        }
+
+        async function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Mostrar loading
+            document.getElementById('analysisResult').innerHTML = `
+                <div class="analyzing">
+                    <div class="spinner"></div>
+                    <p>Analisando cartas...</p>
+                </div>
+            `;
+            document.getElementById('cameraError').innerHTML = '';
+            document.getElementById('btnApplyResult').style.display = 'none';
+
+            try {
+                const base64 = await fileToBase64(file);
+                await analyzeImage(base64);
+            } catch (err) {
+                document.getElementById('cameraError').innerHTML = `
+                    <div class="error-message">⚠️ Erro ao processar imagem: ${err.message}</div>
+                `;
+                document.getElementById('analysisResult').innerHTML = '';
+            }
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        const CARD_ANALYSIS_PROMPT = `Analise esta foto de cartas de baralho de um jogo de Canastra brasileiro.
+
+REGRAS PARA IDENTIFICAÇÃO:
+1. JOGOS: Cartas empilhadas em sequência (mesmo naipe, números consecutivos). Mínimo 3 cartas.
+2. CANASTRA: Jogo com 7+ cartas em sequência.
+   - CANASTRA LIMPA (200 pts): Sem coringa OU apenas o "2" em sua posição natural (ex: A-2-3)
+   - CANASTRA SUJA (100 pts): Com coringa (2 usado fora de posição ou Joker)
+3. CORINGAS: Carta "2" fora de sua posição natural ou Joker
+4. Cartas podem estar na horizontal ou vertical
+5. Jogos podem ser de menor→maior ou maior→menor
+
+VALORES DAS CARTAS:
+- 3,4,5,6,7: 5 pontos cada
+- 8,9,10,J,Q,K: 10 pontos cada  
+- A,2,Joker: 20 pontos cada
+
+Responda APENAS em JSON válido, sem markdown:
+{
+  "success": true/false,
+  "canastras_limpas": número,
+  "canastras_sujas": número,
+  "total_cartas": número,
+  "pontos_cartas": número,
+  "pontos_canastras": número,
+  "total": número,
+  "detalhes": "descrição breve do que foi identificado",
+  "erro": "mensagem se success=false"
+}
+
+Se a imagem não for clara ou não conseguir identificar com certeza, retorne success=false.`;
+
+        async function analyzeImage(base64Data) {
+            try {
+                const response = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model: 'claude-sonnet-4-20250514',
+                        max_tokens: 1000,
+                        messages: [{
+                            role: 'user',
+                            content: [
+                                {
+                                    type: 'image',
+                                    source: {
+                                        type: 'base64',
+                                        media_type: 'image/jpeg',
+                                        data: base64Data
+                                    }
+                                },
+                                {
+                                    type: 'text',
+                                    text: CARD_ANALYSIS_PROMPT
+                                }
+                            ]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error.message || 'Erro na API');
+                }
+
+                const text = data.content.map(c => c.text || '').join('');
+                const cleanJson = text.replace(/```json|```/g, '').trim();
+                
+                try {
+                    const result = JSON.parse(cleanJson);
+                    
+                    if (result.success) {
+                        analysisResult = result;
+                        document.getElementById('analysisResult').innerHTML = `
+                            <div class="analysis-result">
+                                <div class="result-title">✅ Cartas Identificadas</div>
+                                <div class="result-grid">
+                                    <div class="result-item">
+                                        <span>Canastras Limpas</span>
+                                        <span>${result.canastras_limpas} × 200</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span>Canastras Sujas</span>
+                                        <span>${result.canastras_sujas} × 100</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span>Pts Canastras</span>
+                                        <span>${result.pontos_canastras}</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span>Pts Cartas</span>
+                                        <span>${result.pontos_cartas}</span>
+                                    </div>
+                                    <div class="result-item result-total">
+                                        <span>TOTAL</span>
+                                        <span>${result.total}</span>
+                                    </div>
+                                    ${result.detalhes ? `<div class="result-details">${result.detalhes}</div>` : ''}
+                                </div>
+                            </div>
+                        `;
+                        document.getElementById('btnApplyResult').style.display = 'block';
+                        document.getElementById('btnApplyResult').textContent = `Usar ${result.total} pts`;
+                    } else {
+                        document.getElementById('cameraError').innerHTML = `
+                            <div class="error-message">⚠️ ${result.erro || 'Não foi possível identificar as cartas na imagem'}</div>
+                        `;
+                        document.getElementById('analysisResult').innerHTML = '';
+                    }
+                } catch (parseErr) {
+                    document.getElementById('cameraError').innerHTML = `
+                        <div class="error-message">⚠️ Erro ao processar resposta da análise</div>
+                    `;
+                    document.getElementById('analysisResult').innerHTML = '';
+                }
+            } catch (err) {
+                let errorMsg = err.message;
+                if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+                    errorMsg = 'Sem conexão com internet. O reconhecimento por foto requer conexão.';
+                }
+                document.getElementById('cameraError').innerHTML = `
+                    <div class="error-message">⚠️ ${errorMsg}</div>
+                `;
+                document.getElementById('analysisResult').innerHTML = '';
+            }
+        }
+
+        function applyAnalysisResult() {
+            if (!analysisResult) return;
+
+            closeModal();
+
+            // Voltar ao modal de pontuação e preencher o campo
+            setTimeout(() => {
+                openScoreModal();
+                setTimeout(() => {
+                    if (currentTeam === 'nos') {
+                        document.getElementById('nosPoints').value = analysisResult.total;
+                    } else {
+                        document.getElementById('elesPoints').value = analysisResult.total;
+                    }
+                    analysisResult = null;
+                    currentTeam = null;
+                }, 100);
+            }, 300);
+        }
+
+        // Modal helpers
+        function showModal(content) {
+            let overlay = document.getElementById('modalOverlay');
+            
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'modalOverlay';
+                overlay.className = 'modal-overlay';
+                overlay.onclick = (e) => {
+                    if (e.target === overlay) closeModal();
+                };
+                document.body.appendChild(overlay);
+            }
+
+            overlay.innerHTML = `<div class="modal" onclick="event.stopPropagation()">${content}</div>`;
+            
+            // Trigger animation
+            requestAnimationFrame(() => {
+                overlay.classList.add('active');
+            });
+        }
+
+        function closeModal() {
+            const overlay = document.getElementById('modalOverlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
+            currentModal = null;
+        }
+
+        // PWA Install
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installPrompt').classList.add('show');
+        });
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    deferredPrompt = null;
+                    document.getElementById('installPrompt').classList.remove('show');
+                });
+            }
+        }
+
+        function dismissInstall() {
+            document.getElementById('installPrompt').classList.remove('show');
+        }
+
+        // Offline detection
+        function updateOnlineStatus() {
+            const indicator = document.getElementById('offlineIndicator');
+            if (!navigator.onLine) {
+                indicator.classList.add('show');
+            } else {
+                indicator.classList.remove('show');
+            }
+        }
+
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+
+        // Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker registrado'))
+                .catch(err => console.log('Erro ao registrar SW:', err));
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            loadGame();
+            render();
+            updateOnlineStatus();
+        });
+    </script>
+</body>
+</html>

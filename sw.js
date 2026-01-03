@@ -1,11 +1,10 @@
-const CACHE_NAME = 'canastra-v1';
+const CACHE_NAME = 'canastra-v2';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
   './icon-192.png',
-  './icon-512.png',
-  'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap'
+  './icon-512.png'
 ];
 
 // Install - cache resources
@@ -43,7 +42,7 @@ self.addEventListener('activate', event => {
 // Fetch - serve from cache, fallback to network
 self.addEventListener('fetch', event => {
   // Skip API calls - they need network
-  if (event.request.url.includes('api.anthropic.com')) {
+  if (event.request.url.includes('generativelanguage.googleapis.com')) {
     return;
   }
 
@@ -60,14 +59,14 @@ self.addEventListener('fetch', event => {
 
         return fetch(fetchRequest).then(response => {
           // Check if valid response
-          if (!response || response.status !== 200 || response.type !== 'basic') {
+          if (!response || response.status !== 200) {
             return response;
           }
 
           // Clone the response
           const responseToCache = response.clone();
 
-          // Cache the new resource
+          // Cache the new resource (fonts, etc)
           caches.open(CACHE_NAME)
             .then(cache => {
               cache.put(event.request, responseToCache);
@@ -76,7 +75,7 @@ self.addEventListener('fetch', event => {
           return response;
         }).catch(() => {
           // If offline and requesting HTML, return cached index
-          if (event.request.headers.get('accept').includes('text/html')) {
+          if (event.request.headers.get('accept')?.includes('text/html')) {
             return caches.match('./index.html');
           }
         });

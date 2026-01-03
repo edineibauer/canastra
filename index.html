@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Canastra">
-    <meta name="description" content="Marcador de pontos para Canastra com reconhecimento de cartas por foto">
+    <meta name="description" content="Marcador de pontos para Canastra com reconhecimento de cartas por IA">
     
     <title>Canastra Score</title>
     
@@ -15,9 +15,9 @@
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <link rel="apple-touch-icon" href="icon-192.png">
     
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap');
+        
         * {
             box-sizing: border-box;
             margin: 0;
@@ -46,6 +46,7 @@
         .header {
             text-align: center;
             margin-bottom: 24px;
+            position: relative;
         }
 
         .logo {
@@ -64,6 +65,25 @@
             margin-top: 4px;
         }
 
+        .btn-settings {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.1);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            color: #888;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-settings:hover { background: rgba(255,255,255,0.15); color: #fff; }
+        .btn-settings.configured { color: #2ecc71; }
+
         .scoreboard {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -78,21 +98,11 @@
             text-align: center;
             border: 2px solid transparent;
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
         }
 
-        .team-card.nos {
-            border-color: rgba(233, 69, 96, 0.3);
-        }
-
-        .team-card.eles {
-            border-color: rgba(69, 162, 233, 0.3);
-        }
-
-        .team-card.winner {
-            animation: pulse 1s infinite;
-        }
+        .team-card.nos { border-color: rgba(233, 69, 96, 0.3); }
+        .team-card.eles { border-color: rgba(69, 162, 233, 0.3); }
+        .team-card.winner { animation: pulse 1s infinite; }
 
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
@@ -106,13 +116,8 @@
             margin-bottom: 8px;
         }
 
-        .team-card.nos .team-name {
-            color: #e94560;
-        }
-
-        .team-card.eles .team-name {
-            color: #45a2e9;
-        }
+        .team-card.nos .team-name { color: #e94560; }
+        .team-card.eles .team-name { color: #45a2e9; }
 
         .team-score {
             font-size: 2.5rem;
@@ -133,13 +138,8 @@
             transition: width 0.5s ease;
         }
 
-        .team-card.nos .progress-fill {
-            background: linear-gradient(90deg, #e94560, #ff6b6b);
-        }
-
-        .team-card.eles .progress-fill {
-            background: linear-gradient(90deg, #45a2e9, #6bc5ff);
-        }
+        .team-card.nos .progress-fill { background: linear-gradient(90deg, #e94560, #ff6b6b); }
+        .team-card.eles .progress-fill { background: linear-gradient(90deg, #45a2e9, #6bc5ff); }
 
         .btn-primary {
             width: 100%;
@@ -153,22 +153,41 @@
             color: white;
             cursor: pointer;
             transition: all 0.3s ease;
+            margin-bottom: 12px;
+        }
+
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-primary:active { transform: scale(0.98); }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 14px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 12px;
+            background: transparent;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
             margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+        .btn-secondary:hover { border-color: rgba(255,255,255,0.4); color: #fff; }
+        .btn-secondary.locked { opacity: 0.6; }
+        .btn-secondary.unlocked {
+            border: 2px solid rgba(155, 89, 182, 0.5);
+            background: rgba(155, 89, 182, 0.1);
+            color: #bb86fc;
         }
-
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-primary:active {
-            transform: scale(0.98);
+        .btn-secondary.unlocked:hover {
+            background: rgba(155, 89, 182, 0.2);
+            border-color: rgba(155, 89, 182, 0.7);
         }
 
         .history-section {
@@ -225,17 +244,9 @@
             font-size: 0.7rem;
         }
 
-        .history-score {
-            text-align: center;
-        }
-
-        .history-score.nos {
-            color: #e94560;
-        }
-
-        .history-score.eles {
-            color: #45a2e9;
-        }
+        .history-score { text-align: center; }
+        .history-score.nos { color: #e94560; }
+        .history-score.eles { color: #45a2e9; }
 
         .winner-badge {
             font-size: 0.6rem;
@@ -246,10 +257,7 @@
             margin-left: 4px;
         }
 
-        .history-actions {
-            display: flex;
-            gap: 8px;
-        }
+        .history-actions { display: flex; gap: 8px; }
 
         .btn-icon {
             background: rgba(255,255,255,0.1);
@@ -262,15 +270,8 @@
             transition: all 0.2s;
         }
 
-        .btn-icon:hover, .btn-icon:active {
-            background: rgba(255,255,255,0.2);
-            color: #fff;
-        }
-
-        .btn-icon.delete:hover, .btn-icon.delete:active {
-            background: rgba(233, 69, 96, 0.3);
-            color: #e94560;
-        }
+        .btn-icon:hover { background: rgba(255,255,255,0.2); color: #fff; }
+        .btn-icon.delete:hover { background: rgba(233, 69, 96, 0.3); color: #e94560; }
 
         .empty-history {
             text-align: center;
@@ -286,21 +287,20 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             z-index: 1000;
             padding: 16px;
+            padding-top: 3vh;
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
+            overflow-y: auto;
         }
 
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
 
         .modal {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
@@ -308,111 +308,20 @@
             padding: 24px;
             width: 100%;
             max-width: 400px;
-            max-height: 90vh;
-            overflow-y: auto;
             border: 1px solid rgba(255,255,255,0.1);
             transform: scale(0.9);
             transition: transform 0.3s ease;
+            margin-bottom: 20px;
         }
 
-        .modal-overlay.active .modal {
-            transform: scale(1);
-        }
+        .modal-overlay.active .modal { transform: scale(1); }
 
         .modal-title {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             letter-spacing: 2px;
             text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .winner-select {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .winner-btn {
-            flex: 1;
-            padding: 14px;
-            border: 2px solid rgba(255,255,255,0.2);
-            background: transparent;
-            color: #888;
-            border-radius: 10px;
-            cursor: pointer;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-        }
-
-        .winner-btn.active {
-            border-color: #ffd700;
-            color: #ffd700;
-            background: rgba(255, 215, 0, 0.1);
-        }
-
-        .winner-btn:hover:not(.active) {
-            border-color: rgba(255,255,255,0.4);
-            color: #fff;
-        }
-
-        .input-group {
             margin-bottom: 16px;
-        }
-
-        .input-label {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.8rem;
-            color: #888;
-            margin-bottom: 8px;
-        }
-
-        .input-label.nos {
-            color: #e94560;
-        }
-
-        .input-label.eles {
-            color: #45a2e9;
-        }
-
-        .input-row {
-            display: flex;
-            gap: 8px;
-        }
-
-        .input-field {
-            flex: 1;
-            padding: 14px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px;
-            color: #fff;
-            font-family: 'Space Mono', monospace;
-            font-size: 1.1rem;
-            text-align: center;
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: rgba(255,255,255,0.3);
-        }
-
-        .btn-camera {
-            padding: 14px 16px;
-            background: linear-gradient(135deg, #6b5b95 0%, #9b59b6 100%);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            cursor: pointer;
-            font-size: 1.2rem;
-            transition: all 0.2s;
-        }
-
-        .btn-camera:hover, .btn-camera:active {
-            transform: scale(1.05);
         }
 
         .modal-actions {
@@ -444,62 +353,258 @@
             font-weight: 700;
         }
 
-        .btn-confirm:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Setup Wizard */
+        .setup-step {
+            text-align: center;
+            padding: 16px 0;
         }
 
-        /* Camera Modal */
-        .camera-container {
+        .setup-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+
+        .setup-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .setup-desc {
+            font-size: 0.85rem;
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .setup-steps {
+            text-align: left;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 16px;
             margin: 16px 0;
         }
 
-        .file-input-wrapper {
-            text-align: center;
+        .setup-step-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            align-items: flex-start;
         }
 
-        .file-input {
-            display: none;
+        .setup-step-item:last-child { border-bottom: none; }
+
+        .step-number {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            flex-shrink: 0;
         }
 
-        .btn-upload {
+        .step-text {
+            font-size: 0.8rem;
+            color: #ccc;
+            line-height: 1.5;
+        }
+
+        .btn-external {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 16px 24px;
-            background: linear-gradient(135deg, #6b5b95 0%, #9b59b6 100%);
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             color: white;
             cursor: pointer;
             font-family: 'Space Mono', monospace;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            transition: all 0.2s;
+            text-decoration: none;
+            margin: 8px 0;
+        }
+
+        .btn-external:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(66, 133, 244, 0.4); }
+
+        .input-group {
+            margin: 16px 0;
+        }
+
+        .input-label {
+            font-size: 0.75rem;
+            color: #888;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .input-field:focus { outline: none; border-color: rgba(255,255,255,0.3); }
+        .input-field.error { border-color: #e94560; }
+        .input-field.success { border-color: #2ecc71; }
+
+        .input-hint {
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .input-hint.error { color: #e94560; }
+        .input-hint.success { color: #2ecc71; }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            margin: 12px 0;
+        }
+
+        .status-badge.success {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+
+        .status-badge.pending {
+            background: rgba(241, 196, 15, 0.2);
+            color: #f1c40f;
+        }
+
+        /* Score Modal */
+        .winner-select {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .winner-btn {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid rgba(255,255,255,0.2);
+            background: transparent;
+            color: #888;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
             transition: all 0.2s;
         }
 
-        .btn-upload:hover, .btn-upload:active {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(107, 91, 149, 0.4);
+        .winner-btn.active {
+            border-color: #ffd700;
+            color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .team-input-section {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .team-input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .team-input-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+        }
+
+        .team-input-title.nos { color: #e94560; }
+        .team-input-title.eles { color: #45a2e9; }
+
+        .btn-photo {
+            padding: 8px 12px;
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-photo:hover { transform: scale(1.05); }
+        .btn-photo:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        .points-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Space Mono', monospace;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .points-input:focus { outline: none; border-color: rgba(255,255,255,0.3); }
+
+        .points-breakdown {
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 8px;
+            padding: 8px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 6px;
+            min-height: 20px;
+        }
+
+        .info-text {
+            font-size: 0.75rem;
+            color: #888;
+            text-align: center;
+            margin-bottom: 12px;
         }
 
         .analyzing {
             text-align: center;
-            padding: 24px;
+            padding: 16px;
         }
 
         .spinner {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border: 3px solid rgba(255,255,255,0.1);
             border-top-color: #9b59b6;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 16px;
+            margin: 0 auto 12px;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .error-message {
             background: rgba(233, 69, 96, 0.1);
@@ -507,54 +612,8 @@
             color: #e94560;
             padding: 12px;
             border-radius: 8px;
-            font-size: 0.85rem;
-            margin: 16px 0;
-        }
-
-        .analysis-result {
-            background: rgba(39, 174, 96, 0.1);
-            border: 1px solid rgba(39, 174, 96, 0.3);
-            border-radius: 12px;
-            padding: 16px;
-            margin: 16px 0;
-        }
-
-        .result-title {
-            color: #2ecc71;
-            font-weight: 700;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .result-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            font-size: 0.85rem;
-        }
-
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 6px;
-        }
-
-        .result-total {
-            grid-column: 1 / -1;
-            background: rgba(39, 174, 96, 0.2);
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-
-        .result-details {
-            grid-column: 1 / -1;
-            color: #888;
             font-size: 0.8rem;
-            padding: 8px;
+            margin: 16px 0;
         }
 
         /* Winner Overlay */
@@ -575,10 +634,7 @@
             transition: all 0.5s ease;
         }
 
-        .winner-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
+        .winner-overlay.active { opacity: 1; visibility: visible; }
 
         .winner-text {
             font-family: 'Bebas Neue', sans-serif;
@@ -589,23 +645,15 @@
             text-align: center;
         }
 
-        .winner-text.nos {
-            color: #e94560;
-        }
-
-        .winner-text.eles {
-            color: #45a2e9;
-        }
+        .winner-text.nos { color: #e94560; }
+        .winner-text.eles { color: #45a2e9; }
 
         @keyframes winnerPulse {
             0%, 100% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.1); opacity: 0.8; }
         }
 
-        .winner-score {
-            font-size: 2rem;
-            margin-bottom: 32px;
-        }
+        .winner-score { font-size: 2rem; margin-bottom: 32px; }
 
         .confetti {
             position: absolute;
@@ -614,36 +662,14 @@
             animation: fall 3s linear infinite;
         }
 
-        @keyframes fall {
-            to {
-                transform: translateY(100vh) rotate(720deg);
-            }
-        }
+        @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
 
-        /* Info text */
-        .info-text {
-            font-size: 0.8rem;
-            color: #888;
-            text-align: center;
-            margin-bottom: 8px;
-        }
+        .file-input { display: none; }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
 
-        ::-webkit-scrollbar-track {
-            background: rgba(255,255,255,0.05);
-            border-radius: 3px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2);
-            border-radius: 3px;
-        }
-
-        /* Offline indicator */
         .offline-indicator {
             position: fixed;
             bottom: 16px;
@@ -659,101 +685,61 @@
             transition: opacity 0.3s;
         }
 
-        .offline-indicator.show {
-            opacity: 1;
-        }
-
-        /* Install prompt */
-        .install-prompt {
-            position: fixed;
-            bottom: 16px;
-            left: 16px;
-            right: 16px;
-            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
-            color: white;
-            padding: 16px;
-            border-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 3000;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-
-        .install-prompt.show {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .install-prompt button {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: 'Space Mono', monospace;
-        }
+        .offline-indicator.show { opacity: 1; }
     </style>
 </head>
 <body>
-    <div id="app" class="app">
-        <!-- Loading state -->
-        <div style="text-align: center; padding-top: 40vh;">
-            <div class="spinner"></div>
-            <p>Carregando...</p>
-        </div>
-    </div>
-
-    <!-- Offline Indicator -->
-    <div id="offlineIndicator" class="offline-indicator">
-        📴 Sem conexão - Modo offline
-    </div>
-
-    <!-- Install Prompt -->
-    <div id="installPrompt" class="install-prompt">
-        <span>📱 Instalar app?</span>
-        <div>
-            <button onclick="dismissInstall()">Depois</button>
-            <button onclick="installApp()" style="background: rgba(0,0,0,0.2); margin-left: 8px;">Instalar</button>
-        </div>
-    </div>
+    <div id="app" class="app"></div>
+    <div id="offlineIndicator" class="offline-indicator">📴 Sem conexão</div>
 
     <script>
         // ============================================
-        // CANASTRA SCORE - PWA VANILLA JS
+        // CANASTRA SCORE - PWA COM GEMINI AI
         // ============================================
 
         const TARGET_SCORE = 3000;
         const WIN_BONUS = 100;
+        const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
-        // Estado do jogo
-        let gameData = {
-            nos: 0,
-            eles: 0,
-            history: [],
-            gameOver: false,
-            winner: null
-        };
+        // Estado
+        let gameData = { nos: 0, eles: 0, history: [], gameOver: false, winner: null };
+        let apiKey = localStorage.getItem('gemini_api_key') || '';
+        let selectedWinner = null;
+        let currentPhotoTeam = null;
 
-        // Estado da UI
-        let currentModal = null;
-        let editingIndex = null;
-        let currentTeam = null;
-        let analysisResult = null;
+        // Prompt para o Gemini
+        const CARD_ANALYSIS_PROMPT = `Analise esta foto de cartas de baralho de um jogo de Canastra brasileiro e conte os pontos.
 
-        // PWA Install
-        let deferredPrompt = null;
+REGRAS DE PONTUAÇÃO:
 
-        // Carregar dados salvos
+1. CANASTRAS (jogos com 7 ou mais cartas em sequência do mesmo naipe):
+   - CANASTRA LIMPA = 200 pontos (sem coringa, ou com "2" apenas em sua posição natural como A-2-3)
+   - CANASTRA SUJA = 100 pontos (com coringa/Joker ou "2" usado fora de posição)
+
+2. VALOR DAS CARTAS:
+   - Cartas 3, 4, 5, 6, 7 = 5 pontos cada
+   - Cartas 8, 9, 10, J, Q, K = 10 pontos cada
+   - Cartas A, 2, Coringa/Joker = 20 pontos cada
+
+3. REGRAS DE IDENTIFICAÇÃO:
+   - Jogos são cartas empilhadas em sequência (mesmo naipe, números consecutivos)
+   - Podem estar na horizontal ou vertical
+   - Cartas sobrepostas fazem parte do mesmo jogo
+   - Mínimo 3 cartas para ser um jogo
+   - Coringa: carta "2" fora de posição natural OU Joker
+
+IMPORTANTE: Conte TODAS as cartas visíveis na imagem, incluindo as que estão em jogos e as soltas.
+
+Responda SOMENTE com JSON válido (sem markdown, sem crases):
+{"success":true,"canastras_limpas":0,"canastras_sujas":0,"pontos_canastras":0,"pontos_cartas":0,"total":0,"detalhes":"descrição do que foi identificado"}
+
+Se não conseguir identificar claramente, retorne:
+{"success":false,"erro":"motivo do erro"}`;
+
+        // Carregar dados
         function loadGame() {
             const saved = localStorage.getItem('canastra_game');
-            if (saved) {
-                gameData = JSON.parse(saved);
-            }
+            if (saved) gameData = JSON.parse(saved);
         }
 
         // Salvar dados
@@ -761,190 +747,7 @@
             localStorage.setItem('canastra_game', JSON.stringify(gameData));
         }
 
-        // Renderizar app
-        function render() {
-            const nosProgress = Math.min((gameData.nos / TARGET_SCORE) * 100, 100);
-            const elesProgress = Math.min((gameData.eles / TARGET_SCORE) * 100, 100);
-
-            const historyHTML = gameData.history.length === 0 
-                ? '<div class="empty-history">Nenhuma rodada registrada ainda</div>'
-                : gameData.history.map((round, index) => `
-                    <div class="history-item">
-                        <span class="history-round">R${index + 1}</span>
-                        <span class="history-score nos">
-                            +${round.nos}
-                            ${round.winner === 'nos' ? '<span class="winner-badge">BATEU</span>' : ''}
-                        </span>
-                        <span class="history-score eles">
-                            +${round.eles}
-                            ${round.winner === 'eles' ? '<span class="winner-badge">BATEU</span>' : ''}
-                        </span>
-                        <div class="history-actions">
-                            <button class="btn-icon" onclick="openEdit(${index})">✏️</button>
-                            <button class="btn-icon delete" onclick="deleteRound(${index})">🗑️</button>
-                        </div>
-                    </div>
-                `).join('');
-
-            document.getElementById('app').innerHTML = `
-                <div class="header">
-                    <h1 class="logo">CANASTRA</h1>
-                    <p class="target">Primeiro a ${TARGET_SCORE} pontos vence</p>
-                </div>
-
-                <div class="scoreboard">
-                    <div class="team-card nos ${gameData.winner === 'nos' ? 'winner' : ''}">
-                        <div class="team-name">NÓS</div>
-                        <div class="team-score">${gameData.nos}</div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${nosProgress}%"></div>
-                        </div>
-                    </div>
-                    <div class="team-card eles ${gameData.winner === 'eles' ? 'winner' : ''}">
-                        <div class="team-name">ELES</div>
-                        <div class="team-score">${gameData.eles}</div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${elesProgress}%"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <button class="btn-primary" onclick="openScoreModal()" ${gameData.gameOver ? 'disabled' : ''}>
-                    ✚ MARCAR PONTOS
-                </button>
-
-                <div class="history-section">
-                    <div class="history-title">
-                        HISTÓRICO
-                        ${gameData.history.length > 0 ? '<button class="btn-reset" onclick="confirmReset()">NOVO JOGO</button>' : ''}
-                    </div>
-                    <div class="history-list">
-                        ${historyHTML}
-                    </div>
-                </div>
-            `;
-
-            // Winner overlay
-            renderWinnerOverlay();
-        }
-
-        // Winner overlay
-        function renderWinnerOverlay() {
-            let overlay = document.getElementById('winnerOverlay');
-            
-            if (!overlay) {
-                overlay = document.createElement('div');
-                overlay.id = 'winnerOverlay';
-                overlay.className = 'winner-overlay';
-                document.body.appendChild(overlay);
-            }
-
-            if (gameData.gameOver) {
-                // Confetti
-                let confettiHTML = '';
-                for (let i = 0; i < 30; i++) {
-                    const colors = ['#e94560', '#45a2e9', '#ffd700', '#2ecc71'];
-                    const color = colors[Math.floor(Math.random() * 4)];
-                    const left = Math.random() * 100;
-                    const delay = Math.random() * 3;
-                    const rotation = Math.random() * 360;
-                    confettiHTML += `<div class="confetti" style="left: ${left}%; background-color: ${color}; animation-delay: ${delay}s; transform: rotate(${rotation}deg);"></div>`;
-                }
-
-                overlay.innerHTML = `
-                    ${confettiHTML}
-                    <div class="winner-text ${gameData.winner}">
-                        🏆 ${gameData.winner === 'nos' ? 'NÓS' : 'ELES'} VENCERAM! 🏆
-                    </div>
-                    <div class="winner-score">
-                        ${gameData.nos} × ${gameData.eles}
-                    </div>
-                    <button class="btn-primary" style="width: auto; padding: 16px 32px;" onclick="resetGame()">
-                        NOVO JOGO
-                    </button>
-                `;
-                overlay.classList.add('active');
-            } else {
-                overlay.classList.remove('active');
-            }
-        }
-
-        // Modal de pontuação
-        function openScoreModal() {
-            currentModal = 'score';
-            showModal(`
-                <h2 class="modal-title">MARCAR RODADA</h2>
-                
-                <p class="info-text">Quem bateu? (+100 pontos)</p>
-                <div class="winner-select">
-                    <button class="winner-btn" id="winnerNos" onclick="selectWinner('nos')">🏆 NÓS</button>
-                    <button class="winner-btn" id="winnerEles" onclick="selectWinner('eles')">🏆 ELES</button>
-                </div>
-
-                <div class="input-group">
-                    <div class="input-label nos">PONTOS NÓS (cartas + canastras)</div>
-                    <div class="input-row">
-                        <input type="number" class="input-field" id="nosPoints" placeholder="0" min="0" max="3000" inputmode="numeric">
-                        <button class="btn-camera" onclick="openCamera('nos')">📷</button>
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <div class="input-label eles">PONTOS ELES (cartas + canastras)</div>
-                    <div class="input-row">
-                        <input type="number" class="input-field" id="elesPoints" placeholder="0" min="0" max="3000" inputmode="numeric">
-                        <button class="btn-camera" onclick="openCamera('eles')">📷</button>
-                    </div>
-                </div>
-
-                <div class="modal-actions">
-                    <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-                    <button class="btn-confirm" onclick="confirmRound()">Confirmar</button>
-                </div>
-            `);
-        }
-
-        // Variável para armazenar o ganhador selecionado
-        let selectedWinner = null;
-
-        function selectWinner(team) {
-            if (selectedWinner === team) {
-                selectedWinner = null;
-            } else {
-                selectedWinner = team;
-            }
-            
-            document.getElementById('winnerNos').classList.toggle('active', selectedWinner === 'nos');
-            document.getElementById('winnerEles').classList.toggle('active', selectedWinner === 'eles');
-        }
-
-        function confirmRound() {
-            const nos = parseInt(document.getElementById('nosPoints').value) || 0;
-            const eles = parseInt(document.getElementById('elesPoints').value) || 0;
-            const winBonus = selectedWinner === 'nos' ? WIN_BONUS : 0;
-            const winBonusEles = selectedWinner === 'eles' ? WIN_BONUS : 0;
-
-            const roundData = {
-                id: Date.now(),
-                nos: nos + winBonus,
-                eles: eles + winBonusEles,
-                winner: selectedWinner,
-                timestamp: new Date().toLocaleString('pt-BR')
-            };
-
-            gameData.nos += roundData.nos;
-            gameData.eles += roundData.eles;
-            gameData.history.push(roundData);
-
-            // Verificar vitória
-            checkWinner();
-
-            saveGame();
-            closeModal();
-            selectedWinner = null;
-            render();
-        }
-
+        // Verificar vitória
         function checkWinner() {
             if (!gameData.gameOver) {
                 if (gameData.nos >= TARGET_SCORE) {
@@ -957,167 +760,400 @@
             }
         }
 
-        // Editar rodada
-        function openEdit(index) {
-            editingIndex = index;
-            currentModal = 'edit';
-            const round = gameData.history[index];
-            const winBonus = round.winner === 'nos' ? WIN_BONUS : 0;
-            const winBonusEles = round.winner === 'eles' ? WIN_BONUS : 0;
-            selectedWinner = round.winner;
+        // Renderizar app principal
+        function render() {
+            const nosProgress = Math.min((gameData.nos / TARGET_SCORE) * 100, 100);
+            const elesProgress = Math.min((gameData.eles / TARGET_SCORE) * 100, 100);
+            const isConfigured = !!apiKey;
 
+            const historyHTML = gameData.history.length === 0 
+                ? '<div class="empty-history">Nenhuma rodada registrada</div>'
+                : gameData.history.map((round, index) => `
+                    <div class="history-item">
+                        <span class="history-round">R${index + 1}</span>
+                        <span class="history-score nos">+${round.nos}${round.winner === 'nos' ? '<span class="winner-badge">BATEU</span>' : ''}</span>
+                        <span class="history-score eles">+${round.eles}${round.winner === 'eles' ? '<span class="winner-badge">BATEU</span>' : ''}</span>
+                        <div class="history-actions">
+                            <button class="btn-icon" onclick="openEdit(${index})">✏️</button>
+                            <button class="btn-icon delete" onclick="deleteRound(${index})">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+
+            document.getElementById('app').innerHTML = `
+                <div class="header">
+                    <h1 class="logo">CANASTRA</h1>
+                    <p class="target">Primeiro a ${TARGET_SCORE} pontos</p>
+                    <button class="btn-settings ${isConfigured ? 'configured' : ''}" onclick="openSettings()">⚙️</button>
+                </div>
+
+                <div class="scoreboard">
+                    <div class="team-card nos ${gameData.winner === 'nos' ? 'winner' : ''}">
+                        <div class="team-name">NÓS</div>
+                        <div class="team-score">${gameData.nos}</div>
+                        <div class="progress-bar"><div class="progress-fill" style="width: ${nosProgress}%"></div></div>
+                    </div>
+                    <div class="team-card eles ${gameData.winner === 'eles' ? 'winner' : ''}">
+                        <div class="team-name">ELES</div>
+                        <div class="team-score">${gameData.eles}</div>
+                        <div class="progress-bar"><div class="progress-fill" style="width: ${elesProgress}%"></div></div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="openScoreModal()" ${gameData.gameOver ? 'disabled' : ''}>
+                    ✚ MARCAR PONTOS
+                </button>
+
+                <button class="btn-secondary ${isConfigured ? 'unlocked' : 'locked'}" onclick="${isConfigured ? 'openPhotoScore()' : 'openSettings()'}">
+                    📷 ${isConfigured ? 'PONTUAR POR FOTO' : 'CONFIGURAR PARA USAR FOTO'}
+                </button>
+
+                <div class="history-section">
+                    <div class="history-title">
+                        HISTÓRICO
+                        ${gameData.history.length > 0 ? '<button class="btn-reset" onclick="confirmReset()">NOVO JOGO</button>' : ''}
+                    </div>
+                    <div class="history-list">${historyHTML}</div>
+                </div>
+            `;
+
+            renderWinnerOverlay();
+        }
+
+        // Winner overlay
+        function renderWinnerOverlay() {
+            let overlay = document.getElementById('winnerOverlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'winnerOverlay';
+                overlay.className = 'winner-overlay';
+                document.body.appendChild(overlay);
+            }
+
+            if (gameData.gameOver) {
+                let confetti = '';
+                for (let i = 0; i < 30; i++) {
+                    const colors = ['#e94560', '#45a2e9', '#ffd700', '#2ecc71'];
+                    confetti += `<div class="confetti" style="left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*4)]};animation-delay:${Math.random()*3}s;"></div>`;
+                }
+                overlay.innerHTML = `
+                    ${confetti}
+                    <div class="winner-text ${gameData.winner}">🏆 ${gameData.winner === 'nos' ? 'NÓS' : 'ELES'} VENCERAM! 🏆</div>
+                    <div class="winner-score">${gameData.nos} × ${gameData.eles}</div>
+                    <button class="btn-primary" style="width:auto;padding:16px 32px;" onclick="resetGame()">NOVO JOGO</button>
+                `;
+                overlay.classList.add('active');
+            } else {
+                overlay.classList.remove('active');
+            }
+        }
+
+        // Modal de configuração
+        function openSettings() {
+            const isConfigured = !!apiKey;
+            
             showModal(`
-                <h2 class="modal-title">EDITAR RODADA ${index + 1}</h2>
+                <h2 class="modal-title">⚙️ CONFIGURAÇÃO</h2>
+                
+                ${isConfigured ? `
+                    <div style="text-align:center;">
+                        <div class="status-badge success">✓ IA Configurada</div>
+                    </div>
+                    <p class="info-text">O reconhecimento por foto está ativo!</p>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Chave API do Gemini</label>
+                        <input type="password" class="input-field success" id="apiKeyInput" value="${apiKey}" placeholder="AIza...">
+                        <p class="input-hint">Sua chave está salva no seu dispositivo.</p>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button class="btn-cancel" onclick="removeApiKey()">Remover</button>
+                        <button class="btn-confirm" onclick="saveApiKey()">Salvar</button>
+                    </div>
+                ` : `
+                    <div class="setup-step">
+                        <div class="setup-icon">🤖</div>
+                        <h3 class="setup-title">ATIVAR RECONHECIMENTO POR FOTO</h3>
+                        <p class="setup-desc">
+                            Para contar pontos por foto, você precisa de uma chave gratuita do Google Gemini. É rápido e fácil!
+                        </p>
+                    </div>
+
+                    <div class="setup-steps">
+                        <div class="setup-step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-text">Clique no botão azul abaixo</div>
+                        </div>
+                        <div class="setup-step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-text">Faça login com sua conta Google</div>
+                        </div>
+                        <div class="setup-step-item">
+                            <div class="step-number">3</div>
+                            <div class="step-text">Clique em <strong>"Criar chave de API"</strong></div>
+                        </div>
+                        <div class="setup-step-item">
+                            <div class="step-number">4</div>
+                            <div class="step-text">Copie a chave (começa com "AIza...")</div>
+                        </div>
+                        <div class="setup-step-item">
+                            <div class="step-number">5</div>
+                            <div class="step-text">Volte aqui e cole no campo abaixo</div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center;">
+                        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="btn-external">
+                            🔗 Obter Chave Gratuita
+                        </a>
+                        <p class="input-hint">100% gratuito - até 1500 fotos por dia!</p>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Cole sua chave aqui:</label>
+                        <input type="text" class="input-field" id="apiKeyInput" placeholder="AIzaSy..." autocomplete="off">
+                        <p class="input-hint" id="keyHint"></p>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button class="btn-cancel" onclick="closeModal()">Depois</button>
+                        <button class="btn-confirm" id="btnSaveKey" onclick="validateAndSaveKey()">Validar</button>
+                    </div>
+                `}
+            `);
+        }
+
+        // Validar e salvar chave
+        async function validateAndSaveKey() {
+            const input = document.getElementById('apiKeyInput');
+            const hint = document.getElementById('keyHint');
+            const btn = document.getElementById('btnSaveKey');
+            const key = input.value.trim();
+
+            if (!key) {
+                input.classList.add('error');
+                hint.textContent = 'Cole a chave API';
+                hint.classList.add('error');
+                return;
+            }
+
+            if (!key.startsWith('AIza')) {
+                input.classList.add('error');
+                hint.textContent = 'Chave inválida. Deve começar com "AIza"';
+                hint.classList.add('error');
+                return;
+            }
+
+            btn.textContent = 'Validando...';
+            btn.disabled = true;
+            input.classList.remove('error');
+            hint.classList.remove('error');
+            hint.textContent = '';
+
+            try {
+                const response = await fetch(`${GEMINI_API_URL}?key=${key}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: 'Responda apenas: OK' }] }]
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error.message || 'Chave inválida');
+                }
+
+                apiKey = key;
+                localStorage.setItem('gemini_api_key', key);
+                
+                input.classList.add('success');
+                hint.textContent = '✓ Chave válida!';
+                hint.classList.add('success');
+
+                setTimeout(() => {
+                    closeModal();
+                    render();
+                }, 800);
+
+            } catch (err) {
+                input.classList.add('error');
+                hint.textContent = 'Erro: ' + (err.message.includes('API_KEY') ? 'Chave inválida' : err.message);
+                hint.classList.add('error');
+                btn.textContent = 'Validar';
+                btn.disabled = false;
+            }
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            if (key) {
+                apiKey = key;
+                localStorage.setItem('gemini_api_key', key);
+            }
+            closeModal();
+            render();
+        }
+
+        function removeApiKey() {
+            if (confirm('Remover chave? O reconhecimento por foto será desativado.')) {
+                apiKey = '';
+                localStorage.removeItem('gemini_api_key');
+                closeModal();
+                render();
+            }
+        }
+
+        // Modal de pontuação manual
+        function openScoreModal() {
+            selectedWinner = null;
+            showModal(`
+                <h2 class="modal-title">MARCAR RODADA</h2>
                 
                 <p class="info-text">Quem bateu? (+100 pontos)</p>
                 <div class="winner-select">
-                    <button class="winner-btn ${round.winner === 'nos' ? 'active' : ''}" id="winnerNos" onclick="selectWinner('nos')">🏆 NÓS</button>
-                    <button class="winner-btn ${round.winner === 'eles' ? 'active' : ''}" id="winnerEles" onclick="selectWinner('eles')">🏆 ELES</button>
+                    <button class="winner-btn" id="winnerNos" onclick="selectWinner('nos')">🏆 NÓS</button>
+                    <button class="winner-btn" id="winnerEles" onclick="selectWinner('eles')">🏆 ELES</button>
                 </div>
 
-                <div class="input-group">
-                    <div class="input-label nos">PONTOS NÓS</div>
-                    <input type="number" class="input-field" id="nosPoints" value="${round.nos - winBonus}" min="0" max="3000" inputmode="numeric">
+                <div class="team-input-section">
+                    <div class="team-input-header">
+                        <span class="team-input-title nos">PONTOS NÓS</span>
+                    </div>
+                    <input type="number" class="points-input" id="nosPoints" placeholder="0" min="0" max="5000" inputmode="numeric">
                 </div>
 
-                <div class="input-group">
-                    <div class="input-label eles">PONTOS ELES</div>
-                    <input type="number" class="input-field" id="elesPoints" value="${round.eles - winBonusEles}" min="0" max="3000" inputmode="numeric">
+                <div class="team-input-section">
+                    <div class="team-input-header">
+                        <span class="team-input-title eles">PONTOS ELES</span>
+                    </div>
+                    <input type="number" class="points-input" id="elesPoints" placeholder="0" min="0" max="5000" inputmode="numeric">
                 </div>
 
                 <div class="modal-actions">
                     <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-                    <button class="btn-confirm" onclick="saveEdit()">Salvar</button>
+                    <button class="btn-confirm" onclick="confirmRound()">Confirmar</button>
                 </div>
             `);
         }
 
-        function saveEdit() {
+        function selectWinner(team) {
+            selectedWinner = selectedWinner === team ? null : team;
+            document.getElementById('winnerNos').classList.toggle('active', selectedWinner === 'nos');
+            document.getElementById('winnerEles').classList.toggle('active', selectedWinner === 'eles');
+        }
+
+        function confirmRound() {
             const nos = parseInt(document.getElementById('nosPoints').value) || 0;
             const eles = parseInt(document.getElementById('elesPoints').value) || 0;
-            const winBonus = selectedWinner === 'nos' ? WIN_BONUS : 0;
-            const winBonusEles = selectedWinner === 'eles' ? WIN_BONUS : 0;
-
-            gameData.history[editingIndex] = {
-                ...gameData.history[editingIndex],
-                nos: nos + winBonus,
-                eles: eles + winBonusEles,
-                winner: selectedWinner
-            };
-
-            // Recalcular totais
-            const totals = gameData.history.reduce((acc, r) => ({
-                nos: acc.nos + r.nos,
-                eles: acc.eles + r.eles
-            }), { nos: 0, eles: 0 });
-
-            gameData.nos = totals.nos;
-            gameData.eles = totals.eles;
-            gameData.gameOver = totals.nos >= TARGET_SCORE || totals.eles >= TARGET_SCORE;
-            gameData.winner = totals.nos >= TARGET_SCORE ? 'nos' : (totals.eles >= TARGET_SCORE ? 'eles' : null);
-
-            saveGame();
+            
+            addRound(nos, eles, selectedWinner);
             closeModal();
-            selectedWinner = null;
-            editingIndex = null;
-            render();
         }
 
-        function deleteRound(index) {
-            if (!confirm('Excluir esta rodada?')) return;
+        function addRound(nosBase, elesBase, winner) {
+            const nosBonus = winner === 'nos' ? WIN_BONUS : 0;
+            const elesBonus = winner === 'eles' ? WIN_BONUS : 0;
 
-            gameData.history.splice(index, 1);
-
-            // Recalcular totais
-            const totals = gameData.history.reduce((acc, r) => ({
-                nos: acc.nos + r.nos,
-                eles: acc.eles + r.eles
-            }), { nos: 0, eles: 0 });
-
-            gameData.nos = totals.nos;
-            gameData.eles = totals.eles;
-            gameData.gameOver = totals.nos >= TARGET_SCORE || totals.eles >= TARGET_SCORE;
-            gameData.winner = totals.nos >= TARGET_SCORE ? 'nos' : (totals.eles >= TARGET_SCORE ? 'eles' : null);
-
-            saveGame();
-            render();
-        }
-
-        // Reset
-        function confirmReset() {
-            if (confirm('Iniciar novo jogo? Todo o histórico será apagado.')) {
-                resetGame();
-            }
-        }
-
-        function resetGame() {
-            gameData = {
-                nos: 0,
-                eles: 0,
-                history: [],
-                gameOver: false,
-                winner: null
+            const round = {
+                id: Date.now(),
+                nos: nosBase + nosBonus,
+                eles: elesBase + elesBonus,
+                winner: winner,
+                timestamp: new Date().toLocaleString('pt-BR')
             };
+
+            gameData.nos += round.nos;
+            gameData.eles += round.eles;
+            gameData.history.push(round);
+
+            checkWinner();
             saveGame();
             render();
         }
 
-        // Câmera / Análise de imagem
-        function openCamera(team) {
-            currentTeam = team;
-            analysisResult = null;
-            currentModal = 'camera';
-
+        // Modal de pontuação por foto
+        function openPhotoScore() {
+            selectedWinner = null;
+            
             showModal(`
-                <h2 class="modal-title">CONTAR CARTAS - ${team === 'nos' ? 'NÓS' : 'ELES'}</h2>
+                <h2 class="modal-title">📷 PONTUAR POR FOTO</h2>
+                
+                <p class="info-text">Quem bateu? (+100 pontos)</p>
+                <div class="winner-select">
+                    <button class="winner-btn" id="winnerNos" onclick="selectWinner('nos')">🏆 NÓS</button>
+                    <button class="winner-btn" id="winnerEles" onclick="selectWinner('eles')">🏆 ELES</button>
+                </div>
 
-                <div class="camera-container">
-                    <div class="file-input-wrapper">
-                        <input type="file" accept="image/*" capture="environment" id="fileInput" class="file-input" onchange="handleFileSelect(event)">
-                        <button class="btn-upload" onclick="document.getElementById('fileInput').click()">
-                            📷 Tirar Foto / Escolher Imagem
-                        </button>
+                <div class="team-input-section">
+                    <div class="team-input-header">
+                        <span class="team-input-title nos">PONTOS NÓS</span>
+                        <button class="btn-photo" onclick="openCamera('nos')">📷 Foto</button>
                     </div>
+                    <input type="number" class="points-input" id="nosPoints" placeholder="0" min="0" inputmode="numeric">
+                    <div class="points-breakdown" id="nosBreakdown"></div>
+                </div>
 
-                    <p style="text-align: center; font-size: 0.75rem; color: #888; margin-top: 12px;">
-                        Tire uma foto nítida das cartas na mesa.<br>
-                        O reconhecimento requer conexão com internet.
-                    </p>
-
-                    <div id="cameraError"></div>
-                    <div id="analysisResult"></div>
+                <div class="team-input-section">
+                    <div class="team-input-header">
+                        <span class="team-input-title eles">PONTOS ELES</span>
+                        <button class="btn-photo" onclick="openCamera('eles')">📷 Foto</button>
+                    </div>
+                    <input type="number" class="points-input" id="elesPoints" placeholder="0" min="0" inputmode="numeric">
+                    <div class="points-breakdown" id="elesBreakdown"></div>
                 </div>
 
                 <div class="modal-actions">
                     <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-                    <button class="btn-confirm" id="btnApplyResult" style="display: none;" onclick="applyAnalysisResult()">Usar pontos</button>
+                    <button class="btn-confirm" onclick="confirmRound()">Confirmar</button>
                 </div>
+
+                <input type="file" accept="image/*" capture="environment" class="file-input" id="cameraInput" onchange="handlePhoto(event)">
             `);
         }
 
-        async function handleFileSelect(e) {
+        function openCamera(team) {
+            currentPhotoTeam = team;
+            document.getElementById('cameraInput').click();
+        }
+
+        async function handlePhoto(e) {
             const file = e.target.files[0];
             if (!file) return;
 
-            // Mostrar loading
-            document.getElementById('analysisResult').innerHTML = `
-                <div class="analyzing">
-                    <div class="spinner"></div>
-                    <p>Analisando cartas...</p>
-                </div>
-            `;
-            document.getElementById('cameraError').innerHTML = '';
-            document.getElementById('btnApplyResult').style.display = 'none';
+            const team = currentPhotoTeam;
+            const breakdownEl = document.getElementById(team + 'Breakdown');
+            const inputEl = document.getElementById(team + 'Points');
+
+            breakdownEl.innerHTML = '<div class="analyzing"><div class="spinner"></div><p>Analisando cartas...</p></div>';
 
             try {
                 const base64 = await fileToBase64(file);
-                await analyzeImage(base64);
+                const result = await analyzeWithGemini(base64);
+
+                if (result.success) {
+                    inputEl.value = result.total;
+                    breakdownEl.innerHTML = `
+                        ✓ ${result.canastras_limpas || 0} canastra(s) limpa(s) = ${(result.canastras_limpas || 0) * 200}pts<br>
+                        ✓ ${result.canastras_sujas || 0} canastra(s) suja(s) = ${(result.canastras_sujas || 0) * 100}pts<br>
+                        ✓ Valor das cartas = ${result.pontos_cartas || 0}pts<br>
+                        <strong style="color:#2ecc71;">Total: ${result.total}pts</strong>
+                        ${result.detalhes ? '<br><small style="color:#888;">' + result.detalhes + '</small>' : ''}
+                    `;
+                } else {
+                    breakdownEl.innerHTML = `<span style="color:#e94560;">⚠️ ${result.erro || 'Não foi possível analisar a imagem'}</span>`;
+                }
             } catch (err) {
-                document.getElementById('cameraError').innerHTML = `
-                    <div class="error-message">⚠️ Erro ao processar imagem: ${err.message}</div>
-                `;
-                document.getElementById('analysisResult').innerHTML = '';
+                let errorMsg = err.message;
+                if (err.message.includes('Failed to fetch')) {
+                    errorMsg = 'Sem conexão com internet';
+                }
+                breakdownEl.innerHTML = `<span style="color:#e94560;">⚠️ ${errorMsg}</span>`;
             }
+
+            e.target.value = '';
         }
 
         function fileToBase64(file) {
@@ -1129,214 +1165,142 @@
             });
         }
 
-        const CARD_ANALYSIS_PROMPT = `Analise esta foto de cartas de baralho de um jogo de Canastra brasileiro.
-
-REGRAS PARA IDENTIFICAÇÃO:
-1. JOGOS: Cartas empilhadas em sequência (mesmo naipe, números consecutivos). Mínimo 3 cartas.
-2. CANASTRA: Jogo com 7+ cartas em sequência.
-   - CANASTRA LIMPA (200 pts): Sem coringa OU apenas o "2" em sua posição natural (ex: A-2-3)
-   - CANASTRA SUJA (100 pts): Com coringa (2 usado fora de posição ou Joker)
-3. CORINGAS: Carta "2" fora de sua posição natural ou Joker
-4. Cartas podem estar na horizontal ou vertical
-5. Jogos podem ser de menor→maior ou maior→menor
-
-VALORES DAS CARTAS:
-- 3,4,5,6,7: 5 pontos cada
-- 8,9,10,J,Q,K: 10 pontos cada  
-- A,2,Joker: 20 pontos cada
-
-Responda APENAS em JSON válido, sem markdown:
-{
-  "success": true/false,
-  "canastras_limpas": número,
-  "canastras_sujas": número,
-  "total_cartas": número,
-  "pontos_cartas": número,
-  "pontos_canastras": número,
-  "total": número,
-  "detalhes": "descrição breve do que foi identificado",
-  "erro": "mensagem se success=false"
-}
-
-Se a imagem não for clara ou não conseguir identificar com certeza, retorne success=false.`;
-
-        async function analyzeImage(base64Data) {
-            try {
-                const response = await fetch('https://api.anthropic.com/v1/messages', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        model: 'claude-sonnet-4-20250514',
-                        max_tokens: 1000,
-                        messages: [{
-                            role: 'user',
-                            content: [
-                                {
-                                    type: 'image',
-                                    source: {
-                                        type: 'base64',
-                                        media_type: 'image/jpeg',
-                                        data: base64Data
-                                    }
-                                },
-                                {
-                                    type: 'text',
-                                    text: CARD_ANALYSIS_PROMPT
-                                }
-                            ]
-                        }]
-                    })
-                });
-
-                const data = await response.json();
-                
-                if (data.error) {
-                    throw new Error(data.error.message || 'Erro na API');
-                }
-
-                const text = data.content.map(c => c.text || '').join('');
-                const cleanJson = text.replace(/```json|```/g, '').trim();
-                
-                try {
-                    const result = JSON.parse(cleanJson);
-                    
-                    if (result.success) {
-                        analysisResult = result;
-                        document.getElementById('analysisResult').innerHTML = `
-                            <div class="analysis-result">
-                                <div class="result-title">✅ Cartas Identificadas</div>
-                                <div class="result-grid">
-                                    <div class="result-item">
-                                        <span>Canastras Limpas</span>
-                                        <span>${result.canastras_limpas} × 200</span>
-                                    </div>
-                                    <div class="result-item">
-                                        <span>Canastras Sujas</span>
-                                        <span>${result.canastras_sujas} × 100</span>
-                                    </div>
-                                    <div class="result-item">
-                                        <span>Pts Canastras</span>
-                                        <span>${result.pontos_canastras}</span>
-                                    </div>
-                                    <div class="result-item">
-                                        <span>Pts Cartas</span>
-                                        <span>${result.pontos_cartas}</span>
-                                    </div>
-                                    <div class="result-item result-total">
-                                        <span>TOTAL</span>
-                                        <span>${result.total}</span>
-                                    </div>
-                                    ${result.detalhes ? `<div class="result-details">${result.detalhes}</div>` : ''}
-                                </div>
-                            </div>
-                        `;
-                        document.getElementById('btnApplyResult').style.display = 'block';
-                        document.getElementById('btnApplyResult').textContent = `Usar ${result.total} pts`;
-                    } else {
-                        document.getElementById('cameraError').innerHTML = `
-                            <div class="error-message">⚠️ ${result.erro || 'Não foi possível identificar as cartas na imagem'}</div>
-                        `;
-                        document.getElementById('analysisResult').innerHTML = '';
+        async function analyzeWithGemini(base64Data) {
+            const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [
+                            { inline_data: { mime_type: 'image/jpeg', data: base64Data } },
+                            { text: CARD_ANALYSIS_PROMPT }
+                        ]
+                    }],
+                    generationConfig: {
+                        temperature: 0.1,
+                        maxOutputTokens: 1024
                     }
-                } catch (parseErr) {
-                    document.getElementById('cameraError').innerHTML = `
-                        <div class="error-message">⚠️ Erro ao processar resposta da análise</div>
-                    `;
-                    document.getElementById('analysisResult').innerHTML = '';
-                }
-            } catch (err) {
-                let errorMsg = err.message;
-                if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
-                    errorMsg = 'Sem conexão com internet. O reconhecimento por foto requer conexão.';
-                }
-                document.getElementById('cameraError').innerHTML = `
-                    <div class="error-message">⚠️ ${errorMsg}</div>
-                `;
-                document.getElementById('analysisResult').innerHTML = '';
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                throw new Error(data.error.message || 'Erro na API');
+            }
+
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            const cleanJson = text.replace(/```json|```/g, '').trim();
+
+            try {
+                return JSON.parse(cleanJson);
+            } catch {
+                return { success: false, erro: 'Resposta inválida da IA' };
             }
         }
 
-        function applyAnalysisResult() {
-            if (!analysisResult) return;
+        // Editar rodada
+        function openEdit(index) {
+            const round = gameData.history[index];
+            const nosBase = round.nos - (round.winner === 'nos' ? WIN_BONUS : 0);
+            const elesBase = round.eles - (round.winner === 'eles' ? WIN_BONUS : 0);
+            selectedWinner = round.winner;
 
+            showModal(`
+                <h2 class="modal-title">EDITAR RODADA ${index + 1}</h2>
+                
+                <p class="info-text">Quem bateu?</p>
+                <div class="winner-select">
+                    <button class="winner-btn ${round.winner === 'nos' ? 'active' : ''}" id="winnerNos" onclick="selectWinner('nos')">🏆 NÓS</button>
+                    <button class="winner-btn ${round.winner === 'eles' ? 'active' : ''}" id="winnerEles" onclick="selectWinner('eles')">🏆 ELES</button>
+                </div>
+
+                <div class="team-input-section">
+                    <span class="team-input-title nos">PONTOS NÓS</span>
+                    <input type="number" class="points-input" id="nosPoints" value="${nosBase}" min="0" inputmode="numeric">
+                </div>
+
+                <div class="team-input-section">
+                    <span class="team-input-title eles">PONTOS ELES</span>
+                    <input type="number" class="points-input" id="elesPoints" value="${elesBase}" min="0" inputmode="numeric">
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button class="btn-confirm" onclick="saveEdit(${index})">Salvar</button>
+                </div>
+            `);
+        }
+
+        function saveEdit(index) {
+            const nos = parseInt(document.getElementById('nosPoints').value) || 0;
+            const eles = parseInt(document.getElementById('elesPoints').value) || 0;
+
+            gameData.history[index] = {
+                ...gameData.history[index],
+                nos: nos + (selectedWinner === 'nos' ? WIN_BONUS : 0),
+                eles: eles + (selectedWinner === 'eles' ? WIN_BONUS : 0),
+                winner: selectedWinner
+            };
+
+            recalculateTotals();
             closeModal();
+        }
 
-            // Voltar ao modal de pontuação e preencher o campo
-            setTimeout(() => {
-                openScoreModal();
-                setTimeout(() => {
-                    if (currentTeam === 'nos') {
-                        document.getElementById('nosPoints').value = analysisResult.total;
-                    } else {
-                        document.getElementById('elesPoints').value = analysisResult.total;
-                    }
-                    analysisResult = null;
-                    currentTeam = null;
-                }, 100);
-            }, 300);
+        function deleteRound(index) {
+            if (!confirm('Excluir esta rodada?')) return;
+            gameData.history.splice(index, 1);
+            recalculateTotals();
+        }
+
+        function recalculateTotals() {
+            const totals = gameData.history.reduce((acc, r) => ({
+                nos: acc.nos + r.nos,
+                eles: acc.eles + r.eles
+            }), { nos: 0, eles: 0 });
+
+            gameData.nos = totals.nos;
+            gameData.eles = totals.eles;
+            gameData.gameOver = totals.nos >= TARGET_SCORE || totals.eles >= TARGET_SCORE;
+            gameData.winner = totals.nos >= TARGET_SCORE ? 'nos' : (totals.eles >= TARGET_SCORE ? 'eles' : null);
+
+            saveGame();
+            render();
+        }
+
+        function confirmReset() {
+            if (confirm('Iniciar novo jogo?')) resetGame();
+        }
+
+        function resetGame() {
+            gameData = { nos: 0, eles: 0, history: [], gameOver: false, winner: null };
+            saveGame();
+            render();
         }
 
         // Modal helpers
         function showModal(content) {
             let overlay = document.getElementById('modalOverlay');
-            
             if (!overlay) {
                 overlay = document.createElement('div');
                 overlay.id = 'modalOverlay';
                 overlay.className = 'modal-overlay';
-                overlay.onclick = (e) => {
-                    if (e.target === overlay) closeModal();
-                };
+                overlay.onclick = (e) => { if (e.target === overlay) closeModal(); };
                 document.body.appendChild(overlay);
             }
-
-            overlay.innerHTML = `<div class="modal" onclick="event.stopPropagation()">${content}</div>`;
-            
-            // Trigger animation
-            requestAnimationFrame(() => {
-                overlay.classList.add('active');
-            });
+            overlay.innerHTML = `<div class="modal">${content}</div>`;
+            requestAnimationFrame(() => overlay.classList.add('active'));
         }
 
         function closeModal() {
             const overlay = document.getElementById('modalOverlay');
-            if (overlay) {
-                overlay.classList.remove('active');
-            }
-            currentModal = null;
+            if (overlay) overlay.classList.remove('active');
         }
 
-        // PWA Install
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('installPrompt').classList.add('show');
-        });
-
-        function installApp() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    deferredPrompt = null;
-                    document.getElementById('installPrompt').classList.remove('show');
-                });
-            }
-        }
-
-        function dismissInstall() {
-            document.getElementById('installPrompt').classList.remove('show');
-        }
-
-        // Offline detection
+        // Online status
         function updateOnlineStatus() {
             const indicator = document.getElementById('offlineIndicator');
-            if (!navigator.onLine) {
-                indicator.classList.add('show');
-            } else {
-                indicator.classList.remove('show');
-            }
+            indicator.classList.toggle('show', !navigator.onLine);
         }
 
         window.addEventListener('online', updateOnlineStatus);
@@ -1344,12 +1308,10 @@ Se a imagem não for clara ou não conseguir identificar com certeza, retorne su
 
         // Service Worker
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('Service Worker registrado'))
-                .catch(err => console.log('Erro ao registrar SW:', err));
+            navigator.serviceWorker.register('sw.js').catch(() => {});
         }
 
-        // Inicialização
+        // Init
         document.addEventListener('DOMContentLoaded', () => {
             loadGame();
             render();

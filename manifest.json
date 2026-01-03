@@ -1,7 +1,7 @@
 {
   "name": "Canastra Score",
   "short_name": "Canastra",
-  "description": "Marcador de pontos para Canastra com reconhecimento de cartas por foto",
+  "description": "Marcador de pontos para Canastra com reconhecimento de cartas por IA",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1a1a2e",

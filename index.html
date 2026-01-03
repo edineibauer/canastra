@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Canastra">
-    <meta name="description" content="Marcador de pontos para Canastra com reconhecimento de cartas por IA">
+    <meta name="description" content="Marcador de pontos para Canastra">
     
     <title>Canastra Score</title>
     
@@ -46,7 +46,6 @@
         .header {
             text-align: center;
             margin-bottom: 24px;
-            position: relative;
         }
 
         .logo {
@@ -64,25 +63,6 @@
             color: #888;
             margin-top: 4px;
         }
-
-        .btn-settings {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255,255,255,0.1);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            color: #888;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-settings:hover { background: rgba(255,255,255,0.15); color: #fff; }
-        .btn-settings.configured { color: #2ecc71; }
 
         .scoreboard {
             display: grid;
@@ -153,42 +133,12 @@
             color: white;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-bottom: 12px;
+            margin-bottom: 24px;
         }
 
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4); }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         .btn-primary:active { transform: scale(0.98); }
-
-        .btn-secondary {
-            width: 100%;
-            padding: 14px;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.85rem;
-            border: 2px dashed rgba(255,255,255,0.2);
-            border-radius: 12px;
-            background: transparent;
-            color: #888;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-secondary:hover { border-color: rgba(255,255,255,0.4); color: #fff; }
-        .btn-secondary.locked { opacity: 0.6; }
-        .btn-secondary.unlocked {
-            border: 2px solid rgba(155, 89, 182, 0.5);
-            background: rgba(155, 89, 182, 0.1);
-            color: #bb86fc;
-        }
-        .btn-secondary.unlocked:hover {
-            background: rgba(155, 89, 182, 0.2);
-            border-color: rgba(155, 89, 182, 0.7);
-        }
 
         .history-section {
             background: rgba(255,255,255,0.03);
@@ -222,7 +172,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            max-height: 300px;
+            max-height: 350px;
             overflow-y: auto;
         }
 
@@ -247,15 +197,6 @@
         .history-score { text-align: center; }
         .history-score.nos { color: #e94560; }
         .history-score.eles { color: #45a2e9; }
-
-        .winner-badge {
-            font-size: 0.6rem;
-            background: rgba(255, 215, 0, 0.2);
-            color: #ffd700;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-left: 4px;
-        }
 
         .history-actions { display: flex; gap: 8px; }
 
@@ -289,15 +230,13 @@
             bottom: 0;
             background: rgba(0,0,0,0.85);
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: center;
             z-index: 1000;
             padding: 16px;
-            padding-top: 3vh;
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
-            overflow-y: auto;
         }
 
         .modal-overlay.active { opacity: 1; visibility: visible; }
@@ -307,11 +246,10 @@
             border-radius: 20px;
             padding: 24px;
             width: 100%;
-            max-width: 400px;
+            max-width: 360px;
             border: 1px solid rgba(255,255,255,0.1);
             transform: scale(0.9);
             transition: transform 0.3s ease;
-            margin-bottom: 20px;
         }
 
         .modal-overlay.active .modal { transform: scale(1); }
@@ -321,13 +259,13 @@
             font-size: 1.4rem;
             letter-spacing: 2px;
             text-align: center;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .modal-actions {
             display: flex;
             gap: 12px;
-            margin-top: 20px;
+            margin-top: 24px;
         }
 
         .btn-cancel {
@@ -353,171 +291,6 @@
             font-weight: 700;
         }
 
-        .btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        /* Setup Wizard */
-        .setup-step {
-            text-align: center;
-            padding: 16px 0;
-        }
-
-        .setup-icon {
-            font-size: 4rem;
-            margin-bottom: 16px;
-        }
-
-        .setup-title {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.3rem;
-            letter-spacing: 2px;
-            margin-bottom: 12px;
-        }
-
-        .setup-desc {
-            font-size: 0.85rem;
-            color: #aaa;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .setup-steps {
-            text-align: left;
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 16px;
-            margin: 16px 0;
-        }
-
-        .setup-step-item {
-            display: flex;
-            gap: 12px;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            align-items: flex-start;
-        }
-
-        .setup-step-item:last-child { border-bottom: none; }
-
-        .step-number {
-            width: 24px;
-            height: 24px;
-            background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 700;
-            flex-shrink: 0;
-        }
-
-        .step-text {
-            font-size: 0.8rem;
-            color: #ccc;
-            line-height: 1.5;
-        }
-
-        .btn-external {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 14px 24px;
-            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            cursor: pointer;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.85rem;
-            font-weight: 700;
-            transition: all 0.2s;
-            text-decoration: none;
-            margin: 8px 0;
-        }
-
-        .btn-external:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(66, 133, 244, 0.4); }
-
-        .input-group {
-            margin: 16px 0;
-        }
-
-        .input-label {
-            font-size: 0.75rem;
-            color: #888;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 14px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px;
-            color: #fff;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.85rem;
-        }
-
-        .input-field:focus { outline: none; border-color: rgba(255,255,255,0.3); }
-        .input-field.error { border-color: #e94560; }
-        .input-field.success { border-color: #2ecc71; }
-
-        .input-hint {
-            font-size: 0.7rem;
-            color: #666;
-            margin-top: 8px;
-        }
-
-        .input-hint.error { color: #e94560; }
-        .input-hint.success { color: #2ecc71; }
-
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            margin: 12px 0;
-        }
-
-        .status-badge.success {
-            background: rgba(46, 204, 113, 0.2);
-            color: #2ecc71;
-        }
-
-        .status-badge.pending {
-            background: rgba(241, 196, 15, 0.2);
-            color: #f1c40f;
-        }
-
-        /* Score Modal */
-        .winner-select {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .winner-btn {
-            flex: 1;
-            padding: 14px;
-            border: 2px solid rgba(255,255,255,0.2);
-            background: transparent;
-            color: #888;
-            border-radius: 10px;
-            cursor: pointer;
-            font-family: 'Space Mono', monospace;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-        }
-
-        .winner-btn.active {
-            border-color: #ffd700;
-            color: #ffd700;
-            background: rgba(255, 215, 0, 0.1);
-        }
-
         .team-input-section {
             background: rgba(255,255,255,0.03);
             border-radius: 12px;
@@ -525,96 +298,30 @@
             margin-bottom: 12px;
         }
 
-        .team-input-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
         .team-input-title {
             font-family: 'Bebas Neue', sans-serif;
             font-size: 1.1rem;
             letter-spacing: 2px;
+            margin-bottom: 12px;
+            display: block;
         }
 
         .team-input-title.nos { color: #e94560; }
         .team-input-title.eles { color: #45a2e9; }
 
-        .btn-photo {
-            padding: 8px 12px;
-            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-        }
-
-        .btn-photo:hover { transform: scale(1.05); }
-        .btn-photo:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
         .points-input {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
+            border-radius: 10px;
             color: #fff;
             font-family: 'Space Mono', monospace;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             text-align: center;
         }
 
         .points-input:focus { outline: none; border-color: rgba(255,255,255,0.3); }
-
-        .points-breakdown {
-            font-size: 0.7rem;
-            color: #666;
-            margin-top: 8px;
-            padding: 8px;
-            background: rgba(255,255,255,0.02);
-            border-radius: 6px;
-            min-height: 20px;
-        }
-
-        .info-text {
-            font-size: 0.75rem;
-            color: #888;
-            text-align: center;
-            margin-bottom: 12px;
-        }
-
-        .analyzing {
-            text-align: center;
-            padding: 16px;
-        }
-
-        .spinner {
-            width: 32px;
-            height: 32px;
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top-color: #9b59b6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 12px;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .error-message {
-            background: rgba(233, 69, 96, 0.1);
-            border: 1px solid rgba(233, 69, 96, 0.3);
-            color: #e94560;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            margin: 16px 0;
-        }
 
         /* Winner Overlay */
         .winner-overlay {
@@ -664,90 +371,28 @@
 
         @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
 
-        .file-input { display: none; }
-
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
-
-        .offline-indicator {
-            position: fixed;
-            bottom: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(233, 69, 96, 0.9);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            z-index: 3000;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .offline-indicator.show { opacity: 1; }
     </style>
 </head>
 <body>
     <div id="app" class="app"></div>
-    <div id="offlineIndicator" class="offline-indicator">📴 Sem conexão</div>
 
     <script>
-        // ============================================
-        // CANASTRA SCORE - PWA COM GEMINI AI
-        // ============================================
-
         const TARGET_SCORE = 3000;
-        const WIN_BONUS = 100;
-        const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
-        // Estado
         let gameData = { nos: 0, eles: 0, history: [], gameOver: false, winner: null };
-        let apiKey = localStorage.getItem('gemini_api_key') || '';
-        let selectedWinner = null;
-        let currentPhotoTeam = null;
 
-        // Prompt para o Gemini
-        const CARD_ANALYSIS_PROMPT = `Analise esta foto de cartas de baralho de um jogo de Canastra brasileiro e conte os pontos.
-
-REGRAS DE PONTUAÇÃO:
-
-1. CANASTRAS (jogos com 7 ou mais cartas em sequência do mesmo naipe):
-   - CANASTRA LIMPA = 200 pontos (sem coringa, ou com "2" apenas em sua posição natural como A-2-3)
-   - CANASTRA SUJA = 100 pontos (com coringa/Joker ou "2" usado fora de posição)
-
-2. VALOR DAS CARTAS:
-   - Cartas 3, 4, 5, 6, 7 = 5 pontos cada
-   - Cartas 8, 9, 10, J, Q, K = 10 pontos cada
-   - Cartas A, 2, Coringa/Joker = 20 pontos cada
-
-3. REGRAS DE IDENTIFICAÇÃO:
-   - Jogos são cartas empilhadas em sequência (mesmo naipe, números consecutivos)
-   - Podem estar na horizontal ou vertical
-   - Cartas sobrepostas fazem parte do mesmo jogo
-   - Mínimo 3 cartas para ser um jogo
-   - Coringa: carta "2" fora de posição natural OU Joker
-
-IMPORTANTE: Conte TODAS as cartas visíveis na imagem, incluindo as que estão em jogos e as soltas.
-
-Responda SOMENTE com JSON válido (sem markdown, sem crases):
-{"success":true,"canastras_limpas":0,"canastras_sujas":0,"pontos_canastras":0,"pontos_cartas":0,"total":0,"detalhes":"descrição do que foi identificado"}
-
-Se não conseguir identificar claramente, retorne:
-{"success":false,"erro":"motivo do erro"}`;
-
-        // Carregar dados
         function loadGame() {
             const saved = localStorage.getItem('canastra_game');
             if (saved) gameData = JSON.parse(saved);
         }
 
-        // Salvar dados
         function saveGame() {
             localStorage.setItem('canastra_game', JSON.stringify(gameData));
         }
 
-        // Verificar vitória
         function checkWinner() {
             if (!gameData.gameOver) {
                 if (gameData.nos >= TARGET_SCORE) {
@@ -760,19 +405,17 @@ Se não conseguir identificar claramente, retorne:
             }
         }
 
-        // Renderizar app principal
         function render() {
             const nosProgress = Math.min((gameData.nos / TARGET_SCORE) * 100, 100);
             const elesProgress = Math.min((gameData.eles / TARGET_SCORE) * 100, 100);
-            const isConfigured = !!apiKey;
 
             const historyHTML = gameData.history.length === 0 
                 ? '<div class="empty-history">Nenhuma rodada registrada</div>'
                 : gameData.history.map((round, index) => `
                     <div class="history-item">
                         <span class="history-round">R${index + 1}</span>
-                        <span class="history-score nos">+${round.nos}${round.winner === 'nos' ? '<span class="winner-badge">BATEU</span>' : ''}</span>
-                        <span class="history-score eles">+${round.eles}${round.winner === 'eles' ? '<span class="winner-badge">BATEU</span>' : ''}</span>
+                        <span class="history-score nos">+${round.nos}</span>
+                        <span class="history-score eles">+${round.eles}</span>
                         <div class="history-actions">
                             <button class="btn-icon" onclick="openEdit(${index})">✏️</button>
                             <button class="btn-icon delete" onclick="deleteRound(${index})">🗑️</button>
@@ -784,7 +427,6 @@ Se não conseguir identificar claramente, retorne:
                 <div class="header">
                     <h1 class="logo">CANASTRA</h1>
                     <p class="target">Primeiro a ${TARGET_SCORE} pontos</p>
-                    <button class="btn-settings ${isConfigured ? 'configured' : ''}" onclick="openSettings()">⚙️</button>
                 </div>
 
                 <div class="scoreboard">
@@ -804,10 +446,6 @@ Se não conseguir identificar claramente, retorne:
                     ✚ MARCAR PONTOS
                 </button>
 
-                <button class="btn-secondary ${isConfigured ? 'unlocked' : 'locked'}" onclick="${isConfigured ? 'openPhotoScore()' : 'openSettings()'}">
-                    📷 ${isConfigured ? 'PONTUAR POR FOTO' : 'CONFIGURAR PARA USAR FOTO'}
-                </button>
-
                 <div class="history-section">
                     <div class="history-title">
                         HISTÓRICO
@@ -820,7 +458,6 @@ Se não conseguir identificar claramente, retorne:
             renderWinnerOverlay();
         }
 
-        // Winner overlay
         function renderWinnerOverlay() {
             let overlay = document.getElementById('winnerOverlay');
             if (!overlay) {
@@ -848,187 +485,17 @@ Se não conseguir identificar claramente, retorne:
             }
         }
 
-        // Modal de configuração
-        function openSettings() {
-            const isConfigured = !!apiKey;
-            
-            showModal(`
-                <h2 class="modal-title">⚙️ CONFIGURAÇÃO</h2>
-                
-                ${isConfigured ? `
-                    <div style="text-align:center;">
-                        <div class="status-badge success">✓ IA Configurada</div>
-                    </div>
-                    <p class="info-text">O reconhecimento por foto está ativo!</p>
-                    
-                    <div class="input-group">
-                        <label class="input-label">Chave API do Gemini</label>
-                        <input type="password" class="input-field success" id="apiKeyInput" value="${apiKey}" placeholder="AIza...">
-                        <p class="input-hint">Sua chave está salva no seu dispositivo.</p>
-                    </div>
-
-                    <div class="modal-actions">
-                        <button class="btn-cancel" onclick="removeApiKey()">Remover</button>
-                        <button class="btn-confirm" onclick="saveApiKey()">Salvar</button>
-                    </div>
-                ` : `
-                    <div class="setup-step">
-                        <div class="setup-icon">🤖</div>
-                        <h3 class="setup-title">ATIVAR RECONHECIMENTO POR FOTO</h3>
-                        <p class="setup-desc">
-                            Para contar pontos por foto, você precisa de uma chave gratuita do Google Gemini. É rápido e fácil!
-                        </p>
-                    </div>
-
-                    <div class="setup-steps">
-                        <div class="setup-step-item">
-                            <div class="step-number">1</div>
-                            <div class="step-text">Clique no botão azul abaixo</div>
-                        </div>
-                        <div class="setup-step-item">
-                            <div class="step-number">2</div>
-                            <div class="step-text">Faça login com sua conta Google</div>
-                        </div>
-                        <div class="setup-step-item">
-                            <div class="step-number">3</div>
-                            <div class="step-text">Clique em <strong>"Criar chave de API"</strong></div>
-                        </div>
-                        <div class="setup-step-item">
-                            <div class="step-number">4</div>
-                            <div class="step-text">Copie a chave (começa com "AIza...")</div>
-                        </div>
-                        <div class="setup-step-item">
-                            <div class="step-number">5</div>
-                            <div class="step-text">Volte aqui e cole no campo abaixo</div>
-                        </div>
-                    </div>
-
-                    <div style="text-align: center;">
-                        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="btn-external">
-                            🔗 Obter Chave Gratuita
-                        </a>
-                        <p class="input-hint">100% gratuito - até 1500 fotos por dia!</p>
-                    </div>
-
-                    <div class="input-group">
-                        <label class="input-label">Cole sua chave aqui:</label>
-                        <input type="text" class="input-field" id="apiKeyInput" placeholder="AIzaSy..." autocomplete="off">
-                        <p class="input-hint" id="keyHint"></p>
-                    </div>
-
-                    <div class="modal-actions">
-                        <button class="btn-cancel" onclick="closeModal()">Depois</button>
-                        <button class="btn-confirm" id="btnSaveKey" onclick="validateAndSaveKey()">Validar</button>
-                    </div>
-                `}
-            `);
-        }
-
-        // Validar e salvar chave
-        async function validateAndSaveKey() {
-            const input = document.getElementById('apiKeyInput');
-            const hint = document.getElementById('keyHint');
-            const btn = document.getElementById('btnSaveKey');
-            const key = input.value.trim();
-
-            if (!key) {
-                input.classList.add('error');
-                hint.textContent = 'Cole a chave API';
-                hint.classList.add('error');
-                return;
-            }
-
-            if (!key.startsWith('AIza')) {
-                input.classList.add('error');
-                hint.textContent = 'Chave inválida. Deve começar com "AIza"';
-                hint.classList.add('error');
-                return;
-            }
-
-            btn.textContent = 'Validando...';
-            btn.disabled = true;
-            input.classList.remove('error');
-            hint.classList.remove('error');
-            hint.textContent = '';
-
-            try {
-                const response = await fetch(`${GEMINI_API_URL}?key=${key}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: 'Responda apenas: OK' }] }]
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.error) {
-                    throw new Error(data.error.message || 'Chave inválida');
-                }
-
-                apiKey = key;
-                localStorage.setItem('gemini_api_key', key);
-                
-                input.classList.add('success');
-                hint.textContent = '✓ Chave válida!';
-                hint.classList.add('success');
-
-                setTimeout(() => {
-                    closeModal();
-                    render();
-                }, 800);
-
-            } catch (err) {
-                input.classList.add('error');
-                hint.textContent = 'Erro: ' + (err.message.includes('API_KEY') ? 'Chave inválida' : err.message);
-                hint.classList.add('error');
-                btn.textContent = 'Validar';
-                btn.disabled = false;
-            }
-        }
-
-        function saveApiKey() {
-            const key = document.getElementById('apiKeyInput').value.trim();
-            if (key) {
-                apiKey = key;
-                localStorage.setItem('gemini_api_key', key);
-            }
-            closeModal();
-            render();
-        }
-
-        function removeApiKey() {
-            if (confirm('Remover chave? O reconhecimento por foto será desativado.')) {
-                apiKey = '';
-                localStorage.removeItem('gemini_api_key');
-                closeModal();
-                render();
-            }
-        }
-
-        // Modal de pontuação manual
         function openScoreModal() {
-            selectedWinner = null;
             showModal(`
                 <h2 class="modal-title">MARCAR RODADA</h2>
-                
-                <p class="info-text">Quem bateu? (+100 pontos)</p>
-                <div class="winner-select">
-                    <button class="winner-btn" id="winnerNos" onclick="selectWinner('nos')">🏆 NÓS</button>
-                    <button class="winner-btn" id="winnerEles" onclick="selectWinner('eles')">🏆 ELES</button>
-                </div>
 
                 <div class="team-input-section">
-                    <div class="team-input-header">
-                        <span class="team-input-title nos">PONTOS NÓS</span>
-                    </div>
+                    <span class="team-input-title nos">PONTOS NÓS</span>
                     <input type="number" class="points-input" id="nosPoints" placeholder="0" min="0" max="5000" inputmode="numeric">
                 </div>
 
                 <div class="team-input-section">
-                    <div class="team-input-header">
-                        <span class="team-input-title eles">PONTOS ELES</span>
-                    </div>
+                    <span class="team-input-title eles">PONTOS ELES</span>
                     <input type="number" class="points-input" id="elesPoints" placeholder="0" min="0" max="5000" inputmode="numeric">
                 </div>
 
@@ -1037,31 +504,23 @@ Se não conseguir identificar claramente, retorne:
                     <button class="btn-confirm" onclick="confirmRound()">Confirmar</button>
                 </div>
             `);
-        }
 
-        function selectWinner(team) {
-            selectedWinner = selectedWinner === team ? null : team;
-            document.getElementById('winnerNos').classList.toggle('active', selectedWinner === 'nos');
-            document.getElementById('winnerEles').classList.toggle('active', selectedWinner === 'eles');
+            setTimeout(() => document.getElementById('nosPoints').focus(), 100);
         }
 
         function confirmRound() {
             const nos = parseInt(document.getElementById('nosPoints').value) || 0;
             const eles = parseInt(document.getElementById('elesPoints').value) || 0;
-            
-            addRound(nos, eles, selectedWinner);
-            closeModal();
-        }
 
-        function addRound(nosBase, elesBase, winner) {
-            const nosBonus = winner === 'nos' ? WIN_BONUS : 0;
-            const elesBonus = winner === 'eles' ? WIN_BONUS : 0;
+            if (nos === 0 && eles === 0) {
+                closeModal();
+                return;
+            }
 
             const round = {
                 id: Date.now(),
-                nos: nosBase + nosBonus,
-                eles: elesBase + elesBonus,
-                winner: winner,
+                nos: nos,
+                eles: eles,
                 timestamp: new Date().toLocaleString('pt-BR')
             };
 
@@ -1071,158 +530,24 @@ Se não conseguir identificar claramente, retorne:
 
             checkWinner();
             saveGame();
+            closeModal();
             render();
         }
 
-        // Modal de pontuação por foto
-        function openPhotoScore() {
-            selectedWinner = null;
-            
-            showModal(`
-                <h2 class="modal-title">📷 PONTUAR POR FOTO</h2>
-                
-                <p class="info-text">Quem bateu? (+100 pontos)</p>
-                <div class="winner-select">
-                    <button class="winner-btn" id="winnerNos" onclick="selectWinner('nos')">🏆 NÓS</button>
-                    <button class="winner-btn" id="winnerEles" onclick="selectWinner('eles')">🏆 ELES</button>
-                </div>
-
-                <div class="team-input-section">
-                    <div class="team-input-header">
-                        <span class="team-input-title nos">PONTOS NÓS</span>
-                        <button class="btn-photo" onclick="openCamera('nos')">📷 Foto</button>
-                    </div>
-                    <input type="number" class="points-input" id="nosPoints" placeholder="0" min="0" inputmode="numeric">
-                    <div class="points-breakdown" id="nosBreakdown"></div>
-                </div>
-
-                <div class="team-input-section">
-                    <div class="team-input-header">
-                        <span class="team-input-title eles">PONTOS ELES</span>
-                        <button class="btn-photo" onclick="openCamera('eles')">📷 Foto</button>
-                    </div>
-                    <input type="number" class="points-input" id="elesPoints" placeholder="0" min="0" inputmode="numeric">
-                    <div class="points-breakdown" id="elesBreakdown"></div>
-                </div>
-
-                <div class="modal-actions">
-                    <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-                    <button class="btn-confirm" onclick="confirmRound()">Confirmar</button>
-                </div>
-
-                <input type="file" accept="image/*" capture="environment" class="file-input" id="cameraInput" onchange="handlePhoto(event)">
-            `);
-        }
-
-        function openCamera(team) {
-            currentPhotoTeam = team;
-            document.getElementById('cameraInput').click();
-        }
-
-        async function handlePhoto(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const team = currentPhotoTeam;
-            const breakdownEl = document.getElementById(team + 'Breakdown');
-            const inputEl = document.getElementById(team + 'Points');
-
-            breakdownEl.innerHTML = '<div class="analyzing"><div class="spinner"></div><p>Analisando cartas...</p></div>';
-
-            try {
-                const base64 = await fileToBase64(file);
-                const result = await analyzeWithGemini(base64);
-
-                if (result.success) {
-                    inputEl.value = result.total;
-                    breakdownEl.innerHTML = `
-                        ✓ ${result.canastras_limpas || 0} canastra(s) limpa(s) = ${(result.canastras_limpas || 0) * 200}pts<br>
-                        ✓ ${result.canastras_sujas || 0} canastra(s) suja(s) = ${(result.canastras_sujas || 0) * 100}pts<br>
-                        ✓ Valor das cartas = ${result.pontos_cartas || 0}pts<br>
-                        <strong style="color:#2ecc71;">Total: ${result.total}pts</strong>
-                        ${result.detalhes ? '<br><small style="color:#888;">' + result.detalhes + '</small>' : ''}
-                    `;
-                } else {
-                    breakdownEl.innerHTML = `<span style="color:#e94560;">⚠️ ${result.erro || 'Não foi possível analisar a imagem'}</span>`;
-                }
-            } catch (err) {
-                let errorMsg = err.message;
-                if (err.message.includes('Failed to fetch')) {
-                    errorMsg = 'Sem conexão com internet';
-                }
-                breakdownEl.innerHTML = `<span style="color:#e94560;">⚠️ ${errorMsg}</span>`;
-            }
-
-            e.target.value = '';
-        }
-
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result.split(',')[1]);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-
-        async function analyzeWithGemini(base64Data) {
-            const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [
-                            { inline_data: { mime_type: 'image/jpeg', data: base64Data } },
-                            { text: CARD_ANALYSIS_PROMPT }
-                        ]
-                    }],
-                    generationConfig: {
-                        temperature: 0.1,
-                        maxOutputTokens: 1024
-                    }
-                })
-            });
-
-            const data = await response.json();
-
-            if (data.error) {
-                throw new Error(data.error.message || 'Erro na API');
-            }
-
-            const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-            const cleanJson = text.replace(/```json|```/g, '').trim();
-
-            try {
-                return JSON.parse(cleanJson);
-            } catch {
-                return { success: false, erro: 'Resposta inválida da IA' };
-            }
-        }
-
-        // Editar rodada
         function openEdit(index) {
             const round = gameData.history[index];
-            const nosBase = round.nos - (round.winner === 'nos' ? WIN_BONUS : 0);
-            const elesBase = round.eles - (round.winner === 'eles' ? WIN_BONUS : 0);
-            selectedWinner = round.winner;
 
             showModal(`
                 <h2 class="modal-title">EDITAR RODADA ${index + 1}</h2>
-                
-                <p class="info-text">Quem bateu?</p>
-                <div class="winner-select">
-                    <button class="winner-btn ${round.winner === 'nos' ? 'active' : ''}" id="winnerNos" onclick="selectWinner('nos')">🏆 NÓS</button>
-                    <button class="winner-btn ${round.winner === 'eles' ? 'active' : ''}" id="winnerEles" onclick="selectWinner('eles')">🏆 ELES</button>
-                </div>
 
                 <div class="team-input-section">
                     <span class="team-input-title nos">PONTOS NÓS</span>
-                    <input type="number" class="points-input" id="nosPoints" value="${nosBase}" min="0" inputmode="numeric">
+                    <input type="number" class="points-input" id="nosPoints" value="${round.nos}" min="0" inputmode="numeric">
                 </div>
 
                 <div class="team-input-section">
                     <span class="team-input-title eles">PONTOS ELES</span>
-                    <input type="number" class="points-input" id="elesPoints" value="${elesBase}" min="0" inputmode="numeric">
+                    <input type="number" class="points-input" id="elesPoints" value="${round.eles}" min="0" inputmode="numeric">
                 </div>
 
                 <div class="modal-actions">
@@ -1238,9 +563,8 @@ Se não conseguir identificar claramente, retorne:
 
             gameData.history[index] = {
                 ...gameData.history[index],
-                nos: nos + (selectedWinner === 'nos' ? WIN_BONUS : 0),
-                eles: eles + (selectedWinner === 'eles' ? WIN_BONUS : 0),
-                winner: selectedWinner
+                nos: nos,
+                eles: eles
             };
 
             recalculateTotals();
@@ -1269,7 +593,7 @@ Se não conseguir identificar claramente, retorne:
         }
 
         function confirmReset() {
-            if (confirm('Iniciar novo jogo?')) resetGame();
+            if (confirm('Iniciar novo jogo? Todo histórico será apagado.')) resetGame();
         }
 
         function resetGame() {
@@ -1278,7 +602,6 @@ Se não conseguir identificar claramente, retorne:
             render();
         }
 
-        // Modal helpers
         function showModal(content) {
             let overlay = document.getElementById('modalOverlay');
             if (!overlay) {
@@ -1297,25 +620,13 @@ Se não conseguir identificar claramente, retorne:
             if (overlay) overlay.classList.remove('active');
         }
 
-        // Online status
-        function updateOnlineStatus() {
-            const indicator = document.getElementById('offlineIndicator');
-            indicator.classList.toggle('show', !navigator.onLine);
-        }
-
-        window.addEventListener('online', updateOnlineStatus);
-        window.addEventListener('offline', updateOnlineStatus);
-
-        // Service Worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').catch(() => {});
         }
 
-        // Init
         document.addEventListener('DOMContentLoaded', () => {
             loadGame();
             render();
-            updateOnlineStatus();
         });
     </script>
 </body>

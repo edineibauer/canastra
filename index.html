@@ -7,9 +7,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Marcador">
-    <meta name="description" content="Marcador de pontos para Canastra e Pontinho">
-    
-    <title>Marcador de Pontos</title>
+    <meta name="description" content="Marcador de pontos para jogos de baralho">
+
+    <title>Marcador Jogos de Baralho</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -104,6 +104,12 @@
 
         .logo.cacheta {
             background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .logo.jogo7 {
+            background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
             -webkit-background-clip: text;
             background-clip: text;
         }
@@ -226,6 +232,11 @@
             background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
         }
         .btn-primary.cacheta:hover { box-shadow: 0 10px 30px rgba(155, 89, 182, 0.4); }
+
+        .btn-primary.jogo7 {
+            background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
+        }
+        .btn-primary.jogo7:hover { box-shadow: 0 10px 30px rgba(26, 188, 156, 0.4); }
 
         .history-section {
             background: rgba(255,255,255,0.03);
@@ -493,6 +504,7 @@
         .winner-text.eles { color: #45a2e9; }
         .winner-text.pontinho { color: #f1c40f; }
         .winner-text.cacheta { color: #9b59b6; }
+        .winner-text.jogo7 { color: #1abc9c; }
 
         @keyframes winnerPulse {
             0%, 100% { transform: scale(1); opacity: 1; }
@@ -566,6 +578,80 @@
         .player-card.cacheta.eliminated .player-name { color: #e74c3c; }
         .player-card.cacheta.winner .player-name { color: #2ecc71; }
 
+        .player-card.jogo7 {
+            border-color: rgba(26, 188, 156, 0.2);
+        }
+
+        .player-card.jogo7 .player-name { color: #1abc9c; }
+        .player-card.jogo7.eliminated .player-name { color: #e74c3c; }
+        .player-card.jogo7.winner .player-name { color: #2ecc71; }
+
+        .player-card.jogo7 .btn-take-point {
+            margin-top: 8px;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 0.7rem;
+            cursor: pointer;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .player-card.jogo7 .btn-take-point:hover { opacity: 0.9; }
+        .player-card.jogo7 .btn-take-point:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .player-defeats {
+            font-size: 0.55rem;
+            color: #e67e22;
+            margin-top: 2px;
+        }
+
+        /* Pote (pot) styles */
+        .pote-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .pote-card {
+            background: linear-gradient(135deg, rgba(241, 196, 15, 0.2) 0%, rgba(243, 156, 18, 0.2) 100%);
+            border: 2px solid rgba(241, 196, 15, 0.5);
+            border-radius: 12px;
+            padding: 16px 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pote-card:hover {
+            transform: scale(1.02);
+            border-color: rgba(241, 196, 15, 0.8);
+        }
+
+        .pote-card.empty {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        .pote-card.empty:hover {
+            transform: none;
+        }
+
+        .pote-label {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            color: #f1c40f;
+            margin-bottom: 4px;
+        }
+
+        .pote-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #f39c12;
+        }
+
         .player-status {
             font-size: 0.55rem;
             color: #95a5a6;
@@ -598,6 +684,7 @@
         }
 
         .setup-players h3.cacheta { color: #9b59b6; }
+        .setup-players h3.jogo7 { color: #1abc9c; }
 
         .player-count-selector {
             display: flex;
@@ -637,6 +724,15 @@
 
         .count-display.cacheta { color: #9b59b6; }
 
+        .count-btn.jogo7 {
+            border-color: rgba(26, 188, 156, 0.5);
+            color: #1abc9c;
+        }
+
+        .count-btn.jogo7:hover { background: rgba(26, 188, 156, 0.2); }
+
+        .count-display.jogo7 { color: #1abc9c; }
+
         .player-names-list {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -673,6 +769,9 @@
 
         .player-name-input.cacheta { border-color: rgba(155, 89, 182, 0.3); }
         .player-name-input.cacheta:focus { border-color: rgba(155, 89, 182, 0.6); }
+
+        .player-name-input.jogo7 { border-color: rgba(26, 188, 156, 0.3); }
+        .player-name-input.jogo7:focus { border-color: rgba(26, 188, 156, 0.6); }
 
         .player-name-input::placeholder { color: #666; }
 
@@ -878,8 +977,19 @@
             initialScore: 10
         };
 
+        // Jogo do 7 State
+        let jogo7Data = {
+            players: [],
+            pote: 0,
+            gameOver: false,
+            winner: null,
+            setup: true,
+            initialScore: 15
+        };
+
         let tempPlayerCount = 4;
         let tempCachetaPlayerCount = 4;
+        let tempJogo7PlayerCount = 4;
 
         // Load games
         function loadGames() {
@@ -898,6 +1008,11 @@
             if (savedCacheta) {
                 cachetaData = JSON.parse(savedCacheta);
             }
+
+            const savedJogo7 = localStorage.getItem('jogo7_game');
+            if (savedJogo7) {
+                jogo7Data = JSON.parse(savedJogo7);
+            }
         }
 
         function saveCanastra() {
@@ -912,8 +1027,12 @@
             localStorage.setItem('cacheta_game', JSON.stringify(cachetaData));
         }
 
+        function saveJogo7() {
+            localStorage.setItem('jogo7_game', JSON.stringify(jogo7Data));
+        }
+
         function switchGame(direction) {
-            const games = ['canastra', 'pontinho', 'cacheta'];
+            const games = ['canastra', 'pontinho', 'cacheta', 'jogo7'];
             const currentIndex = games.indexOf(currentGame);
             let newIndex;
 
@@ -2289,6 +2408,363 @@
         }
 
         // ============================================
+        // JOGO DO 7
+        // ============================================
+
+        function renderJogo7() {
+            if (jogo7Data.setup) {
+                renderJogo7Setup();
+            } else {
+                renderJogo7Game();
+            }
+        }
+
+        function renderJogo7Setup() {
+            const playerInputs = Array.from({ length: tempJogo7PlayerCount }, (_, i) =>
+                `<input type="text" class="player-name-input jogo7" id="jogo7Player${i}" placeholder="Jogador ${i + 1}" maxlength="15">`
+            ).join('');
+
+            document.getElementById('app').innerHTML = `
+                <div class="header">
+                    <div class="title-row">
+                        <button class="nav-arrow" onclick="switchGame('prev')">‹</button>
+                        <h1 class="logo jogo7">JOGO DO 7</h1>
+                        <button class="nav-arrow" onclick="switchGame('next')">›</button>
+                    </div>
+                    <div class="target-row">
+                        <span class="target">Quem ficar sem pontos, perde</span>
+                    </div>
+                </div>
+
+                <div class="setup-players">
+                    <h3 class="jogo7">QUANTOS JOGADORES?</h3>
+
+                    <div class="player-count-selector">
+                        <button class="count-btn jogo7" onclick="changeJogo7PlayerCount(-1)">−</button>
+                        <span class="count-display jogo7">${tempJogo7PlayerCount}</span>
+                        <button class="count-btn jogo7" onclick="changeJogo7PlayerCount(1)">+</button>
+                    </div>
+
+                    <div class="player-names-list">
+                        ${playerInputs}
+                    </div>
+
+                    <div class="setting-group" style="margin-bottom:16px;">
+                        <label class="setting-label" style="text-align:center;display:block;">Pontos iniciais</label>
+                        <input type="number" class="setting-input" id="jogo7InitialScore" value="${jogo7Data.initialScore}" min="1" max="100" inputmode="numeric">
+                    </div>
+
+                    <button class="btn-primary jogo7" onclick="startJogo7()">
+                        INICIAR JOGO
+                    </button>
+                </div>
+            `;
+        }
+
+        function changeJogo7PlayerCount(delta) {
+            tempJogo7PlayerCount = Math.max(2, Math.min(10, tempJogo7PlayerCount + delta));
+            renderJogo7Setup();
+        }
+
+        function startJogo7() {
+            const initialScore = parseInt(document.getElementById('jogo7InitialScore').value) || 15;
+            jogo7Data.initialScore = initialScore;
+
+            const players = [];
+            for (let i = 0; i < tempJogo7PlayerCount; i++) {
+                const input = document.getElementById(`jogo7Player${i}`);
+                const name = input.value.trim() || `Jogador ${i + 1}`;
+                players.push({
+                    name,
+                    score: initialScore,
+                    defeats: 0,
+                    gaveUp: false
+                });
+            }
+
+            jogo7Data = {
+                ...jogo7Data,
+                players,
+                pote: 0,
+                gameOver: false,
+                winner: null,
+                setup: false
+            };
+
+            saveJogo7();
+            render();
+        }
+
+        function renderJogo7Game() {
+            const activePlayers = jogo7Data.players.filter(p => !p.gaveUp);
+
+            const playersHTML = jogo7Data.players.map((player, i) => {
+                let cardClass = 'player-card jogo7';
+                if (player.gaveUp) cardClass += ' eliminated';
+                if (jogo7Data.winner === i) cardClass += ' winner';
+
+                const isOut = player.score === 0 && !player.gaveUp;
+                const canTakePoint = player.score > 0 && !player.gaveUp && !jogo7Data.gameOver;
+
+                let statusText = '';
+                if (player.gaveUp) statusText = '<div class="player-status">desistiu</div>';
+                else if (isOut) statusText = '<div class="player-status">sem pontos</div>';
+
+                let defeatsText = '';
+                if (player.defeats > 0) {
+                    defeatsText = `<div class="player-defeats">${player.defeats} derrota${player.defeats > 1 ? 's' : ''}</div>`;
+                }
+
+                let actionButtons = '';
+                if (canTakePoint) {
+                    actionButtons = `<button class="btn-take-point" onclick="jogo7TakePoint(${i})">-1 ponto</button>`;
+                } else if (isOut && !jogo7Data.gameOver) {
+                    actionButtons = `
+                        <button class="btn-take-point" style="background:linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);font-size:0.6rem;" onclick="jogo7Restart(${i})">Reiniciar</button>
+                        <button class="btn-take-point" style="background:linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);font-size:0.6rem;margin-top:4px;" onclick="jogo7GiveUp(${i})">Desistir</button>
+                    `;
+                }
+
+                return `
+                    <div class="${cardClass}" ${!player.gaveUp && !jogo7Data.gameOver ? `onclick="openJogo7PlayerOptions(${i})" style="cursor:pointer;"` : ''}>
+                        <div class="player-name">${player.name}</div>
+                        <div class="player-score">${player.score}</div>
+                        ${defeatsText}
+                        ${statusText}
+                        <div onclick="event.stopPropagation();">
+                            ${actionButtons}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            const poteEmpty = jogo7Data.pote === 0;
+
+            document.getElementById('app').innerHTML = `
+                <div class="header">
+                    <div class="title-row">
+                        <button class="nav-arrow" onclick="switchGame('prev')">‹</button>
+                        <h1 class="logo jogo7">JOGO DO 7</h1>
+                        <button class="nav-arrow" onclick="switchGame('next')">›</button>
+                    </div>
+                    <div class="target-row">
+                        <span class="target">${activePlayers.length} jogador${activePlayers.length !== 1 ? 'es' : ''} ativo${activePlayers.length !== 1 ? 's' : ''}</span>
+                    </div>
+                </div>
+
+                <div class="pote-container">
+                    <div class="pote-card ${poteEmpty ? 'empty' : ''}" ${!poteEmpty && !jogo7Data.gameOver ? 'onclick="openPoteModal()"' : ''}>
+                        <div class="pote-label">POTE</div>
+                        <div class="pote-value">${jogo7Data.pote}</div>
+                    </div>
+                </div>
+
+                <div class="players-grid">
+                    ${playersHTML}
+                </div>
+
+                <div class="history-section">
+                    <div class="history-title">
+                        OPÇÕES
+                        <button class="btn-reset" onclick="confirmJogo7Reset()">NOVO JOGO</button>
+                    </div>
+                </div>
+            `;
+
+            renderJogo7Winner();
+        }
+
+        function renderJogo7Winner() {
+            let overlay = document.getElementById('winnerOverlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'winnerOverlay';
+                overlay.className = 'winner-overlay';
+                document.body.appendChild(overlay);
+            }
+
+            if (jogo7Data.gameOver && currentGame === 'jogo7' && jogo7Data.winner !== null) {
+                const winner = jogo7Data.players[jogo7Data.winner];
+
+                // Lista dos perdedores ordenada por derrotas
+                const losers = jogo7Data.players
+                    .filter((p, i) => i !== jogo7Data.winner)
+                    .sort((a, b) => a.defeats - b.defeats);
+
+                let confetti = '';
+                for (let i = 0; i < 30; i++) {
+                    const colors = ['#1abc9c', '#e74c3c', '#2ecc71', '#3498db'];
+                    confetti += `<div class="confetti" style="left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*4)]};animation-delay:${Math.random()*3}s;"></div>`;
+                }
+
+                const losersHTML = losers.map(p => `
+                    <div class="ranking-item">
+                        <span>${p.name}</span>
+                        <span class="ranking-wheels">${p.defeats} derrota${p.defeats !== 1 ? 's' : ''}</span>
+                    </div>
+                `).join('');
+
+                overlay.innerHTML = `
+                    ${confetti}
+                    <div class="winner-text jogo7">🏆 ${winner.name.toUpperCase()} VENCEU! 🏆</div>
+                    <div class="winner-score">${winner.score} pontos | ${winner.defeats} derrota${winner.defeats !== 1 ? 's' : ''}</div>
+
+                    <div class="final-ranking">
+                        <div class="ranking-title">DERROTAS DOS JOGADORES</div>
+                        ${losersHTML}
+                    </div>
+
+                    <button class="btn-primary jogo7" style="width:auto;padding:16px 32px;margin-top:20px;" onclick="resetJogo7()">NOVO JOGO</button>
+                `;
+                overlay.classList.add('active');
+            } else if (currentGame === 'jogo7') {
+                overlay.classList.remove('active');
+            }
+        }
+
+        function jogo7TakePoint(playerIndex) {
+            const player = jogo7Data.players[playerIndex];
+            if (player.score > 0 && !player.gaveUp) {
+                player.score--;
+                jogo7Data.pote++;
+                saveJogo7();
+                render();
+            }
+        }
+
+        function openPoteModal() {
+            if (jogo7Data.pote === 0 || jogo7Data.gameOver) return;
+
+            const activePlayers = jogo7Data.players
+                .map((p, i) => ({ ...p, index: i }))
+                .filter(p => !p.gaveUp);
+
+            const optionsHTML = activePlayers.map(p => `
+                <option value="${p.index}">${p.name} (${jogo7Data.players[p.index].score} pts)</option>
+            `).join('');
+
+            showModal(`
+                <h2 class="modal-title">DISTRIBUIR POTE</h2>
+                <p style="text-align:center;color:#f39c12;font-size:1.5rem;font-weight:bold;margin-bottom:16px;">
+                    ${jogo7Data.pote} ponto${jogo7Data.pote !== 1 ? 's' : ''}
+                </p>
+                <div class="setting-group">
+                    <label class="setting-label">Enviar para qual jogador?</label>
+                    <select class="round-action-select" id="poteRecipient" style="font-size:1rem;padding:12px;">
+                        ${optionsHTML}
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button class="btn-confirm" onclick="confirmPoteDistribution()">Confirmar</button>
+                </div>
+            `);
+        }
+
+        function confirmPoteDistribution() {
+            const recipientIndex = parseInt(document.getElementById('poteRecipient').value);
+            const player = jogo7Data.players[recipientIndex];
+
+            if (player && !player.gaveUp) {
+                player.score += jogo7Data.pote;
+                jogo7Data.pote = 0;
+                saveJogo7();
+            }
+
+            closeModal();
+            render();
+        }
+
+        function jogo7Restart(playerIndex) {
+            const player = jogo7Data.players[playerIndex];
+            player.score = jogo7Data.initialScore;
+            player.defeats++;
+            saveJogo7();
+            render();
+        }
+
+        function jogo7GiveUp(playerIndex) {
+            if (confirm('Tem certeza que deseja desistir? Esta ação não pode ser desfeita.')) {
+                jogo7Data.players[playerIndex].gaveUp = true;
+                jogo7Data.players[playerIndex].defeats++;
+
+                // Check if only one active player left
+                checkJogo7Winner();
+
+                saveJogo7();
+                render();
+            }
+        }
+
+        function checkJogo7Winner() {
+            const activePlayers = jogo7Data.players.filter(p => !p.gaveUp);
+
+            if (activePlayers.length === 1) {
+                const winnerIndex = jogo7Data.players.findIndex(p => !p.gaveUp);
+                jogo7Data.gameOver = true;
+                jogo7Data.winner = winnerIndex;
+            }
+        }
+
+        function openJogo7PlayerOptions(playerIndex) {
+            const player = jogo7Data.players[playerIndex];
+            if (player.gaveUp) return;
+
+            showModal(`
+                <h2 class="modal-title">${player.name.toUpperCase()}</h2>
+                <p style="text-align:center;color:#888;margin-bottom:16px;">
+                    ${player.score} ponto${player.score !== 1 ? 's' : ''} | ${player.defeats} derrota${player.defeats !== 1 ? 's' : ''}
+                </p>
+                <div class="setting-group">
+                    <label class="setting-label">Nome do jogador</label>
+                    <input type="text" class="setting-input" id="editJogo7PlayerName" value="${player.name}" maxlength="15">
+                </div>
+                <div class="wheel-choice-options">
+                    <button class="btn-choice continue" onclick="saveJogo7PlayerName(${playerIndex})">Salvar nome</button>
+                </div>
+                <div class="modal-actions" style="margin-top:12px;">
+                    <button class="btn-cancel" onclick="closeModal()">Fechar</button>
+                </div>
+            `);
+            setTimeout(() => document.getElementById('editJogo7PlayerName').focus(), 100);
+        }
+
+        function saveJogo7PlayerName(playerIndex) {
+            const newName = document.getElementById('editJogo7PlayerName').value.trim();
+            if (newName) {
+                jogo7Data.players[playerIndex].name = newName;
+                saveJogo7();
+            }
+            closeModal();
+            render();
+        }
+
+        function confirmJogo7Reset() {
+            if (confirm('Iniciar novo jogo?')) resetJogo7();
+        }
+
+        function resetJogo7() {
+            jogo7Data = {
+                ...jogo7Data,
+                players: [],
+                pote: 0,
+                gameOver: false,
+                winner: null,
+                setup: true
+            };
+            tempJogo7PlayerCount = 4;
+            saveJogo7();
+
+            // Remove winner overlay
+            const overlay = document.getElementById('winnerOverlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
+
+            render();
+        }
+
+        // ============================================
         // MODAL HELPERS
         // ============================================
 
@@ -2321,6 +2797,8 @@
                 renderPontinho();
             } else if (currentGame === 'cacheta') {
                 renderCacheta();
+            } else if (currentGame === 'jogo7') {
+                renderJogo7();
             }
         }
 

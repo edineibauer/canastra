@@ -1,7 +1,7 @@
 {
-  "name": "Marcador de Pontos",
+  "name": "Marcador Jogos de Baralho",
   "short_name": "Marcador",
-  "description": "Marcador de pontos para Canastra e Pontinho",
+  "description": "Marcador de pontos para jogos de baralho: Canastra, Pontinho, Cacheta e Jogo do 7",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1a1a2e",

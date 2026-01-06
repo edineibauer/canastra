@@ -861,9 +861,6 @@
         let tempPlayerCount = 4;
         let tempCachetaPlayerCount = 4;
 
-        // Pending wheel choices for Pontinho (player index -> choice needed)
-        let pendingWheelChoices = [];
-
         // Load games
         function loadGames() {
             const savedCanastra = localStorage.getItem('canastra_game');
@@ -1255,8 +1252,10 @@
                 let statusText = '';
                 if (player.gaveUp) statusText = '<div class="player-status">desistiu</div>';
 
+                const clickable = !pontinhoData.gameOver && !player.eliminated;
+
                 return `
-                    <div class="${cardClass}">
+                    <div class="${cardClass}" ${clickable ? `onclick="openPontinhoPlayerOptions(${i})" style="cursor:pointer;"` : ''}>
                         <div class="player-name">${player.name}</div>
                         <div class="player-score">${player.score}</div>
                         ${player.wheels > 0 ? `<div class="player-wheels">🔴 ${player.wheels} rodinha${player.wheels > 1 ? 's' : ''}</div>` : ''}
@@ -1431,160 +1430,13 @@
             savePontinho();
             closeModal();
 
-            // If any player got a new wheel, ask them what they want to do
-            if (playersWithNewWheel.length > 0) {
-                pendingWheelChoices = [...playersWithNewWheel];
-                askWheelChoice();
-            } else {
-                checkAndFinalizeRound(zeroCount);
-                render();
-            }
-        }
+            // Check for wheels
+            processWheels(scores);
 
-        function processWheelsAndGetNewWheelPlayers(scores) {
-            let changed = true;
-            const playersWithNewWheel = [];
-
-            while (changed) {
-                changed = false;
-
-                for (let i = 0; i < pontinhoData.players.length; i++) {
-                    const player = pontinhoData.players[i];
-
-                    if (!player.eliminated && !player.gaveUp && player.score >= 100) {
-                        // Got a wheel!
-                        player.wheels++;
-                        scores[i].gotWheel = true;
-
-                        // Track this player for wheel choice
-                        if (!playersWithNewWheel.includes(i)) {
-                            playersWithNewWheel.push(i);
-                        }
-
-                        // Find the highest score below 100 among active players
-                        const validScores = pontinhoData.players
-                            .filter((p, idx) => !p.eliminated && !p.gaveUp && idx !== i && p.score < 100)
-                            .map(p => p.score);
-
-                        if (validScores.length > 0) {
-                            player.score = Math.max(...validScores);
-                        } else {
-                            // If everyone else is also >= 100, set to 0
-                            player.score = 0;
-                        }
-
-                        changed = true;
-                    }
-                }
-            }
-
-            return playersWithNewWheel;
-        }
-
-        function askWheelChoice() {
-            if (pendingWheelChoices.length === 0) {
-                // All choices made, finalize
-                const lastRound = pontinhoData.history[pontinhoData.history.length - 1];
-                const zeroCount = lastRound.scores.filter((s, i) =>
-                    s.points === 0 && !pontinhoData.players[i].eliminated && !pontinhoData.players[i].gaveUp
-                ).length;
-                checkAndFinalizeRound(zeroCount);
-                savePontinho();
-                render();
-                return;
-            }
-
-            const playerIndex = pendingWheelChoices[0];
-            const player = pontinhoData.players[playerIndex];
-
-            // Get highest score among active players for "comeback" option
-            const activeScores = pontinhoData.players
-                .filter((p, i) => !p.eliminated && !p.gaveUp && i !== playerIndex)
-                .map(p => p.score);
-            const highestScore = activeScores.length > 0 ? Math.max(...activeScores) : 0;
-
-            showModal(`
-                <h2 class="modal-title">${player.name.toUpperCase()} FEZ RODINHA!</h2>
-                <p style="text-align:center;color:#888;margin-bottom:16px;">
-                    ${player.wheels} rodinha${player.wheels > 1 ? 's' : ''} no total
-                </p>
-                <div class="wheel-choice-options">
-                    <button class="btn-choice continue" onclick="handleWheelChoice(${playerIndex}, 'continue')">
-                        Continuar jogando (volta com ${player.score} pontos)
-                    </button>
-                    <button class="btn-choice comeback" onclick="handleWheelChoice(${playerIndex}, 'comeback')">
-                        Voltar com quem tem mais pontos (${highestScore} pontos)
-                    </button>
-                    <button class="btn-choice give-up" onclick="handleWheelChoice(${playerIndex}, 'giveup')">
-                        Parar de jogar (aceitar derrota)
-                    </button>
-                </div>
-            `);
-        }
-
-        function handleWheelChoice(playerIndex, choice) {
-            const player = pontinhoData.players[playerIndex];
-
-            if (choice === 'continue') {
-                // Keep current score (already set by processWheels)
-            } else if (choice === 'comeback') {
-                // Get highest score among active players
-                const activeScores = pontinhoData.players
-                    .filter((p, i) => !p.eliminated && !p.gaveUp && i !== playerIndex)
-                    .map(p => p.score);
-                player.score = activeScores.length > 0 ? Math.max(...activeScores) : 0;
-            } else if (choice === 'giveup') {
-                player.gaveUp = true;
-            }
-
-            // Remove from pending choices
-            pendingWheelChoices = pendingWheelChoices.filter(i => i !== playerIndex);
-
-            closeModal();
+            // Check and finalize round
+            checkAndFinalizeRound(zeroCount);
             savePontinho();
-
-            // Ask next player or finalize
-            if (pendingWheelChoices.length > 0) {
-                setTimeout(askWheelChoice, 100);
-            } else {
-                const lastRound = pontinhoData.history[pontinhoData.history.length - 1];
-                const zeroCount = lastRound.scores.filter((s, i) =>
-                    s.points === 0 && !pontinhoData.players[i].eliminated && !pontinhoData.players[i].gaveUp
-                ).length;
-                checkAndFinalizeRound(zeroCount);
-                savePontinho();
-                render();
-            }
-        }
-
-        function checkAndFinalizeRound(zeroCount) {
-            // Check winner - só finaliza se tiver apenas 1 jogador sem rodinha E a rodada teve apenas 1 vencedor
-            const playersWithoutWheels = pontinhoData.players.filter(p => p.wheels === 0 && !p.gaveUp);
-            const activePlayers = pontinhoData.players.filter(p => !p.eliminated && !p.gaveUp);
-
-            if (playersWithoutWheels.length === 1 && zeroCount === 1) {
-                // Jogo finaliza - o jogador sem rodinha vence
-                const winnerIndex = pontinhoData.players.findIndex(p => p.wheels === 0 && !p.gaveUp);
-                pontinhoData.gameOver = true;
-                pontinhoData.winner = winnerIndex;
-
-                pontinhoData.players.forEach((p, i) => {
-                    if (i !== winnerIndex) {
-                        p.eliminated = true;
-                    }
-                });
-            } else if (activePlayers.length === 1) {
-                // Only one active player left, they win
-                const winnerIndex = pontinhoData.players.findIndex(p => !p.eliminated && !p.gaveUp);
-                pontinhoData.gameOver = true;
-                pontinhoData.winner = winnerIndex;
-
-                pontinhoData.players.forEach((p, i) => {
-                    if (i !== winnerIndex) {
-                        p.eliminated = true;
-                    }
-                });
-            }
+            render();
         }
 
         function processWheels(scores) {
@@ -1619,6 +1471,36 @@
             }
         }
 
+        function checkAndFinalizeRound(zeroCount) {
+            // Check winner - só finaliza se tiver apenas 1 jogador sem rodinha E a rodada teve apenas 1 vencedor
+            const playersWithoutWheels = pontinhoData.players.filter(p => p.wheels === 0 && !p.gaveUp);
+            const activePlayers = pontinhoData.players.filter(p => !p.eliminated && !p.gaveUp);
+
+            if (playersWithoutWheels.length === 1 && zeroCount === 1) {
+                // Jogo finaliza - o jogador sem rodinha vence
+                const winnerIndex = pontinhoData.players.findIndex(p => p.wheels === 0 && !p.gaveUp);
+                pontinhoData.gameOver = true;
+                pontinhoData.winner = winnerIndex;
+
+                pontinhoData.players.forEach((p, i) => {
+                    if (i !== winnerIndex) {
+                        p.eliminated = true;
+                    }
+                });
+            } else if (activePlayers.length === 1) {
+                // Only one active player left, they win
+                const winnerIndex = pontinhoData.players.findIndex(p => !p.eliminated && !p.gaveUp);
+                pontinhoData.gameOver = true;
+                pontinhoData.winner = winnerIndex;
+
+                pontinhoData.players.forEach((p, i) => {
+                    if (i !== winnerIndex) {
+                        p.eliminated = true;
+                    }
+                });
+            }
+        }
+
         function openAddPontinhoPlayer() {
             showModal(`
                 <h2 class="modal-title">ADICIONAR JOGADOR</h2>
@@ -1632,6 +1514,69 @@
                 </div>
             `);
             setTimeout(() => document.getElementById('newPlayerName').focus(), 100);
+        }
+
+        function openPontinhoPlayerOptions(playerIndex) {
+            const player = pontinhoData.players[playerIndex];
+            if (player.eliminated) return;
+
+            const gaveUpButton = player.gaveUp
+                ? ''
+                : `<button class="btn-choice give-up" onclick="pontinhoPlayerGiveUp(${playerIndex})">Parar de jogar (desistir)</button>`;
+
+            showModal(`
+                <h2 class="modal-title">${player.name.toUpperCase()}</h2>
+                <p style="text-align:center;color:#888;margin-bottom:16px;">
+                    ${player.score} pontos | ${player.wheels} rodinha${player.wheels !== 1 ? 's' : ''}
+                    ${player.gaveUp ? ' | Desistiu' : ''}
+                </p>
+                <div class="setting-group">
+                    <label class="setting-label">Nome do jogador</label>
+                    <input type="text" class="setting-input" id="editPlayerName" value="${player.name}" maxlength="15">
+                </div>
+                <div class="wheel-choice-options">
+                    <button class="btn-choice continue" onclick="savePontinhoPlayerName(${playerIndex})">Salvar nome</button>
+                    ${gaveUpButton}
+                </div>
+                <div class="modal-actions" style="margin-top:12px;">
+                    <button class="btn-cancel" onclick="closeModal()">Fechar</button>
+                </div>
+            `);
+            setTimeout(() => document.getElementById('editPlayerName').focus(), 100);
+        }
+
+        function savePontinhoPlayerName(playerIndex) {
+            const newName = document.getElementById('editPlayerName').value.trim();
+            if (newName) {
+                pontinhoData.players[playerIndex].name = newName;
+                savePontinho();
+            }
+            closeModal();
+            render();
+        }
+
+        function pontinhoPlayerGiveUp(playerIndex) {
+            if (confirm('Tem certeza que deseja desistir? Esta ação não pode ser desfeita.')) {
+                pontinhoData.players[playerIndex].gaveUp = true;
+
+                // Check if only one active player left
+                const activePlayers = pontinhoData.players.filter(p => !p.eliminated && !p.gaveUp);
+                if (activePlayers.length === 1) {
+                    const winnerIndex = pontinhoData.players.findIndex(p => !p.eliminated && !p.gaveUp);
+                    pontinhoData.gameOver = true;
+                    pontinhoData.winner = winnerIndex;
+
+                    pontinhoData.players.forEach((p, i) => {
+                        if (i !== winnerIndex) {
+                            p.eliminated = true;
+                        }
+                    });
+                }
+
+                savePontinho();
+                closeModal();
+                render();
+            }
         }
 
         function confirmAddPontinhoPlayer() {
@@ -1880,8 +1825,10 @@
                 if (player.eliminated) cardClass += ' eliminated';
                 if (cachetaData.winner === i) cardClass += ' winner';
 
+                const clickable = !cachetaData.gameOver && !player.eliminated;
+
                 return `
-                    <div class="${cardClass}">
+                    <div class="${cardClass}" ${clickable ? `onclick="openCachetaPlayerOptions(${i})" style="cursor:pointer;"` : ''}>
                         <div class="player-name">${player.name}</div>
                         <div class="player-score">${player.score}</div>
                         ${player.eliminated ? '<div class="player-status">eliminado</div>' : ''}
@@ -2104,6 +2051,54 @@
                 </div>
             `);
             setTimeout(() => document.getElementById('newCachetaPlayerName').focus(), 100);
+        }
+
+        function openCachetaPlayerOptions(playerIndex) {
+            const player = cachetaData.players[playerIndex];
+            if (player.eliminated) return;
+
+            showModal(`
+                <h2 class="modal-title">${player.name.toUpperCase()}</h2>
+                <p style="text-align:center;color:#888;margin-bottom:16px;">
+                    ${player.score} ponto${player.score !== 1 ? 's' : ''} restante${player.score !== 1 ? 's' : ''}
+                </p>
+                <div class="setting-group">
+                    <label class="setting-label">Nome do jogador</label>
+                    <input type="text" class="setting-input" id="editCachetaPlayerName" value="${player.name}" maxlength="15">
+                </div>
+                <div class="wheel-choice-options">
+                    <button class="btn-choice continue" onclick="saveCachetaPlayerName(${playerIndex})">Salvar nome</button>
+                    <button class="btn-choice give-up" onclick="cachetaPlayerGiveUp(${playerIndex})">Parar de jogar (desistir)</button>
+                </div>
+                <div class="modal-actions" style="margin-top:12px;">
+                    <button class="btn-cancel" onclick="closeModal()">Fechar</button>
+                </div>
+            `);
+            setTimeout(() => document.getElementById('editCachetaPlayerName').focus(), 100);
+        }
+
+        function saveCachetaPlayerName(playerIndex) {
+            const newName = document.getElementById('editCachetaPlayerName').value.trim();
+            if (newName) {
+                cachetaData.players[playerIndex].name = newName;
+                saveCacheta();
+            }
+            closeModal();
+            render();
+        }
+
+        function cachetaPlayerGiveUp(playerIndex) {
+            if (confirm('Tem certeza que deseja desistir? O jogador será eliminado.')) {
+                cachetaData.players[playerIndex].score = 0;
+                cachetaData.players[playerIndex].eliminated = true;
+
+                // Check if only one active player left
+                checkCachetaWinner();
+
+                saveCacheta();
+                closeModal();
+                render();
+            }
         }
 
         function confirmAddCachetaPlayer() {

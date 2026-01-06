@@ -23,6 +23,17 @@
             margin: 0;
             padding: 0;
             -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        input, select {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
         }
 
         html, body {
@@ -628,22 +639,31 @@
 
         .player-names-list {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 8px;
             margin-bottom: 16px;
-            max-height: 200px;
+            max-height: 250px;
             overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        @media (max-width: 300px) {
+            .player-names-list {
+                grid-template-columns: 1fr;
+            }
         }
 
         .player-name-input {
-            padding: 10px 8px;
+            padding: 10px 6px;
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(243, 156, 18, 0.3);
             border-radius: 8px;
             color: #fff;
             font-family: 'Space Mono', monospace;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             text-align: center;
+            width: 100%;
+            min-width: 0;
         }
 
         .player-name-input:focus {
@@ -1388,6 +1408,17 @@
                     <button class="btn-confirm" onclick="confirmPontinhoRound()">Confirmar</button>
                 </div>
             `);
+
+            // Add Enter key handler to all inputs
+            const inputs = document.querySelectorAll('.points-input');
+            inputs.forEach(input => {
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        confirmPontinhoRound();
+                    }
+                });
+            });
         }
 
         function confirmPontinhoRound() {
@@ -1421,17 +1452,14 @@
                 }
             }
 
-            // Check for wheels and get players who got a wheel this round
-            const playersWithNewWheel = processWheelsAndGetNewWheelPlayers(scores);
-
             // Add to history
             pontinhoData.history.push({ id: Date.now(), scores });
 
-            savePontinho();
-            closeModal();
-
             // Check for wheels
             processWheels(scores);
+
+            savePontinho();
+            closeModal();
 
             // Check and finalize round
             checkAndFinalizeRound(zeroCount);
@@ -1971,6 +1999,17 @@
                     <button class="btn-confirm" onclick="confirmCachetaRound()">Confirmar</button>
                 </div>
             `);
+
+            // Add Enter key handler to all selects
+            const selects = document.querySelectorAll('.round-action-select');
+            selects.forEach(select => {
+                select.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        confirmCachetaRound();
+                    }
+                });
+            });
         }
 
         function confirmCachetaRound() {

@@ -6,10 +6,10 @@
     <meta name="theme-color" content="#1a1a2e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Canastra">
-    <meta name="description" content="Marcador de pontos para Canastra">
+    <meta name="apple-mobile-web-app-title" content="Marcador">
+    <meta name="description" content="Marcador de pontos para Canastra e Pontinho">
     
-    <title>Canastra Score</title>
+    <title>Marcador de Pontos</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -38,19 +38,46 @@
         }
 
         .app {
-            padding: 16px;
-            padding-bottom: 100px;
+            padding: 12px;
+            padding-bottom: 80px;
             min-height: 100vh;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .title-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .nav-arrow {
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.3);
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 0 6px;
+            line-height: 1;
+        }
+
+        .nav-arrow:hover { 
+            color: rgba(255,255,255,0.7); 
+        }
+
+        .logo-container {
+            text-align: center;
         }
 
         .logo {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 3rem;
+            font-size: 2rem;
             letter-spacing: 4px;
             background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%);
             -webkit-background-clip: text;
@@ -58,10 +85,43 @@
             background-clip: text;
         }
 
+        .logo.pontinho {
+            background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .target-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 2px;
+        }
+
         .target {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #888;
-            margin-top: 4px;
+        }
+
+        .btn-settings {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            color: #666;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-settings:hover { 
+            border-color: rgba(255,255,255,0.4); 
+            color: #fff; 
         }
 
         .scoreboard {
@@ -123,9 +183,9 @@
 
         .btn-primary {
             width: 100%;
-            padding: 18px;
+            padding: 14px;
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             letter-spacing: 2px;
             border: none;
             border-radius: 12px;
@@ -133,25 +193,30 @@
             color: white;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
 
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4); }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         .btn-primary:active { transform: scale(0.98); }
 
+        .btn-primary.pontinho {
+            background: linear-gradient(135deg, #f39c12 0%, #f1c40f 100%);
+        }
+        .btn-primary.pontinho:hover { box-shadow: 0 10px 30px rgba(243, 156, 18, 0.4); }
+
         .history-section {
             background: rgba(255,255,255,0.03);
-            border-radius: 16px;
-            padding: 16px;
+            border-radius: 12px;
+            padding: 12px;
         }
 
         .history-title {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.2rem;
+            font-size: 1rem;
             letter-spacing: 2px;
             color: #888;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -171,43 +236,54 @@
         .history-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            max-height: 350px;
+            gap: 6px;
+            max-height: 200px;
             overflow-y: auto;
         }
 
         .history-item {
-            display: grid;
-            grid-template-columns: auto 1fr 1fr auto;
-            gap: 12px;
+            display: flex;
             align-items: center;
+            gap: 8px;
             background: rgba(255,255,255,0.05);
-            padding: 12px;
+            padding: 8px 10px;
             border-radius: 8px;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
         }
 
         .history-round {
             background: rgba(255,255,255,0.1);
-            padding: 4px 8px;
+            padding: 3px 6px;
             border-radius: 4px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
+            flex-shrink: 0;
+        }
+
+        .history-scores {
+            flex: 1;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
         }
 
         .history-score { text-align: center; }
         .history-score.nos { color: #e94560; }
         .history-score.eles { color: #45a2e9; }
 
-        .history-actions { display: flex; gap: 8px; }
+        .history-actions { 
+            display: flex; 
+            gap: 6px;
+            flex-shrink: 0;
+        }
 
         .btn-icon {
             background: rgba(255,255,255,0.1);
             border: none;
             color: #888;
-            padding: 6px 8px;
+            padding: 5px 7px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             transition: all 0.2s;
         }
 
@@ -230,13 +306,15 @@
             bottom: 0;
             background: rgba(0,0,0,0.85);
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             z-index: 1000;
             padding: 16px;
+            padding-top: 10vh;
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
+            overflow-y: auto;
         }
 
         .modal-overlay.active { opacity: 1; visibility: visible; }
@@ -246,10 +324,11 @@
             border-radius: 20px;
             padding: 24px;
             width: 100%;
-            max-width: 360px;
+            max-width: 400px;
             border: 1px solid rgba(255,255,255,0.1);
             transform: scale(0.9);
             transition: transform 0.3s ease;
+            margin-bottom: 20px;
         }
 
         .modal-overlay.active .modal { transform: scale(1); }
@@ -305,11 +384,14 @@
 
         .team-input-title {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 1rem;
+            font-size: 0.9rem;
             letter-spacing: 2px;
             margin-bottom: 10px;
             display: block;
             text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .team-input-title.nos { color: #e94560; }
@@ -317,17 +399,43 @@
 
         .points-input {
             width: 100%;
-            padding: 14px 8px;
+            padding: 12px 8px;
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 10px;
             color: #fff;
             font-family: 'Space Mono', monospace;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             text-align: center;
         }
 
         .points-input:focus { outline: none; border-color: rgba(255,255,255,0.3); }
+
+        /* Settings */
+        .setting-group {
+            margin-bottom: 20px;
+        }
+
+        .setting-label {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .setting-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .setting-input:focus { outline: none; border-color: rgba(255,255,255,0.3); }
 
         /* Winner Overlay */
         .winner-overlay {
@@ -345,13 +453,14 @@
             opacity: 0;
             visibility: hidden;
             transition: all 0.5s ease;
+            padding: 20px;
         }
 
         .winner-overlay.active { opacity: 1; visibility: visible; }
 
         .winner-text {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 2.5rem;
+            font-size: 2rem;
             letter-spacing: 4px;
             margin-bottom: 16px;
             animation: winnerPulse 1s infinite;
@@ -360,13 +469,14 @@
 
         .winner-text.nos { color: #e94560; }
         .winner-text.eles { color: #45a2e9; }
+        .winner-text.pontinho { color: #f1c40f; }
 
         @keyframes winnerPulse {
             0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 0.8; }
         }
 
-        .winner-score { font-size: 2rem; margin-bottom: 32px; }
+        .winner-score { font-size: 1.5rem; margin-bottom: 24px; }
 
         .confetti {
             position: absolute;
@@ -377,6 +487,211 @@
 
         @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
 
+        /* Pontinho Styles */
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .player-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 10px 6px;
+            text-align: center;
+            border: 2px solid rgba(243, 156, 18, 0.2);
+            position: relative;
+        }
+
+        .player-card.eliminated {
+            opacity: 0.5;
+            border-color: rgba(231, 76, 60, 0.3);
+        }
+
+        .player-card.winner {
+            border-color: rgba(46, 204, 113, 0.5);
+            animation: pulse 1s infinite;
+        }
+
+        .player-name {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            color: #f1c40f;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-card.eliminated .player-name { color: #e74c3c; }
+        .player-card.winner .player-name { color: #2ecc71; }
+
+        .player-score {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .player-wheels {
+            font-size: 0.6rem;
+            color: #e74c3c;
+            margin-top: 4px;
+        }
+
+        .setup-players {
+            text-align: center;
+            padding: 20px 10px;
+        }
+
+        .setup-players h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+            color: #f1c40f;
+        }
+
+        .player-count-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .count-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid rgba(243, 156, 18, 0.5);
+            background: transparent;
+            color: #f1c40f;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .count-btn:hover { background: rgba(243, 156, 18, 0.2); }
+
+        .count-display {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #f1c40f;
+            min-width: 50px;
+        }
+
+        .player-names-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 16px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .player-name-input {
+            padding: 10px 8px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(243, 156, 18, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        .player-name-input:focus { 
+            outline: none; 
+            border-color: rgba(243, 156, 18, 0.6); 
+        }
+
+        .player-name-input::placeholder { color: #666; }
+
+        /* Pontinho history */
+        .pontinho-history-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            background: rgba(255,255,255,0.05);
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+        }
+
+        .pontinho-history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pontinho-history-scores {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .pontinho-score-chip {
+            background: rgba(243, 156, 18, 0.1);
+            padding: 3px 6px;
+            border-radius: 4px;
+            color: #f1c40f;
+            font-size: 0.65rem;
+        }
+
+        .pontinho-score-chip.wheel {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+
+        .pontinho-score-chip.winner {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+
+        /* Final ranking */
+        .final-ranking {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .ranking-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            color: #888;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .ranking-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .ranking-item:last-child { border-bottom: none; }
+
+        .ranking-position {
+            font-weight: 700;
+            margin-right: 10px;
+        }
+
+        .ranking-position.first { color: #f1c40f; }
+        .ranking-position.second { color: #bdc3c7; }
+        .ranking-position.third { color: #cd6133; }
+
+        .ranking-wheels {
+            color: #e74c3c;
+            font-size: 0.75rem;
+        }
+
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
@@ -386,83 +701,137 @@
     <div id="app" class="app"></div>
 
     <script>
-        const TARGET_SCORE = 3000;
+        // ============================================
+        // MARCADOR DE PONTOS - CANASTRA & PONTINHO
+        // ============================================
 
-        let gameData = { nos: 0, eles: 0, history: [], gameOver: false, winner: null };
+        let currentGame = localStorage.getItem('current_game') || 'canastra';
 
-        function loadGame() {
-            const saved = localStorage.getItem('canastra_game');
-            if (saved) gameData = JSON.parse(saved);
+        // Canastra State
+        let canastraData = {
+            nos: 0,
+            eles: 0,
+            history: [],
+            gameOver: false,
+            winner: null,
+            targetScore: 3000
+        };
+
+        // Pontinho State
+        let pontinhoData = {
+            players: [],
+            history: [],
+            gameOver: false,
+            winner: null,
+            setup: true
+        };
+
+        let tempPlayerCount = 4;
+
+        // Load games
+        function loadGames() {
+            const savedCanastra = localStorage.getItem('canastra_game');
+            if (savedCanastra) {
+                const parsed = JSON.parse(savedCanastra);
+                canastraData = { ...canastraData, ...parsed };
+            }
+
+            const savedPontinho = localStorage.getItem('pontinho_game');
+            if (savedPontinho) {
+                pontinhoData = JSON.parse(savedPontinho);
+            }
         }
 
-        function saveGame() {
-            localStorage.setItem('canastra_game', JSON.stringify(gameData));
+        function saveCanastra() {
+            localStorage.setItem('canastra_game', JSON.stringify(canastraData));
         }
 
-        function checkWinner() {
-            if (!gameData.gameOver) {
-                // Quando um dos times passa de 3000, quem tem mais pontos vence
-                if (gameData.nos >= TARGET_SCORE || gameData.eles >= TARGET_SCORE) {
-                    gameData.gameOver = true;
-                    gameData.winner = gameData.nos >= gameData.eles ? 'nos' : 'eles';
+        function savePontinho() {
+            localStorage.setItem('pontinho_game', JSON.stringify(pontinhoData));
+        }
+
+        function switchGame(game) {
+            currentGame = game;
+            localStorage.setItem('current_game', game);
+            render();
+        }
+
+        // ============================================
+        // CANASTRA
+        // ============================================
+
+        function checkCanastraWinner() {
+            if (!canastraData.gameOver) {
+                if (canastraData.nos >= canastraData.targetScore || canastraData.eles >= canastraData.targetScore) {
+                    canastraData.gameOver = true;
+                    canastraData.winner = canastraData.nos >= canastraData.eles ? 'nos' : 'eles';
                 }
             }
         }
 
-        function render() {
-            const nosProgress = Math.min((gameData.nos / TARGET_SCORE) * 100, 100);
-            const elesProgress = Math.min((gameData.eles / TARGET_SCORE) * 100, 100);
+        function renderCanastra() {
+            const nosProgress = Math.min((canastraData.nos / canastraData.targetScore) * 100, 100);
+            const elesProgress = Math.min((canastraData.eles / canastraData.targetScore) * 100, 100);
 
-            const historyHTML = gameData.history.length === 0 
+            const historyHTML = canastraData.history.length === 0 
                 ? '<div class="empty-history">Nenhuma rodada registrada</div>'
-                : gameData.history.map((round, index) => `
+                : canastraData.history.map((round, index) => `
                     <div class="history-item">
                         <span class="history-round">R${index + 1}</span>
-                        <span class="history-score nos">+${round.nos}</span>
-                        <span class="history-score eles">+${round.eles}</span>
+                        <div class="history-scores">
+                            <span class="history-score nos">+${round.nos}</span>
+                            <span class="history-score eles">+${round.eles}</span>
+                        </div>
                         <div class="history-actions">
-                            <button class="btn-icon" onclick="openEdit(${index})">✏️</button>
-                            <button class="btn-icon delete" onclick="deleteRound(${index})">🗑️</button>
+                            <button class="btn-icon" onclick="openCanastraEdit(${index})">✏️</button>
+                            <button class="btn-icon delete" onclick="deleteCanastraRound(${index})">🗑️</button>
                         </div>
                     </div>
                 `).join('');
 
             document.getElementById('app').innerHTML = `
                 <div class="header">
-                    <h1 class="logo">CANASTRA</h1>
-                    <p class="target">Primeiro a ${TARGET_SCORE} pontos</p>
+                    <div class="title-row">
+                        <button class="nav-arrow" onclick="switchGame('pontinho')">‹</button>
+                        <h1 class="logo">CANASTRA</h1>
+                        <button class="nav-arrow" onclick="switchGame('pontinho')">›</button>
+                    </div>
+                    <div class="target-row">
+                        <span class="target">Primeiro a ${canastraData.targetScore} pontos</span>
+                        <button class="btn-settings" onclick="openCanastraSettings()">⚙️</button>
+                    </div>
                 </div>
 
                 <div class="scoreboard">
-                    <div class="team-card nos ${gameData.winner === 'nos' ? 'winner' : ''}">
+                    <div class="team-card nos ${canastraData.winner === 'nos' ? 'winner' : ''}">
                         <div class="team-name">NÓS</div>
-                        <div class="team-score">${gameData.nos}</div>
+                        <div class="team-score">${canastraData.nos}</div>
                         <div class="progress-bar"><div class="progress-fill" style="width: ${nosProgress}%"></div></div>
                     </div>
-                    <div class="team-card eles ${gameData.winner === 'eles' ? 'winner' : ''}">
+                    <div class="team-card eles ${canastraData.winner === 'eles' ? 'winner' : ''}">
                         <div class="team-name">ELES</div>
-                        <div class="team-score">${gameData.eles}</div>
+                        <div class="team-score">${canastraData.eles}</div>
                         <div class="progress-bar"><div class="progress-fill" style="width: ${elesProgress}%"></div></div>
                     </div>
                 </div>
 
-                <button class="btn-primary" onclick="openScoreModal()" ${gameData.gameOver ? 'disabled' : ''}>
+                <button class="btn-primary" onclick="openCanastraScore()" ${canastraData.gameOver ? 'disabled' : ''}>
                     ✚ MARCAR PONTOS
                 </button>
 
                 <div class="history-section">
                     <div class="history-title">
                         HISTÓRICO
-                        ${gameData.history.length > 0 ? '<button class="btn-reset" onclick="confirmReset()">NOVO JOGO</button>' : ''}
+                        ${canastraData.history.length > 0 ? '<button class="btn-reset" onclick="confirmCanastraReset()">NOVO JOGO</button>' : ''}
                     </div>
                     <div class="history-list">${historyHTML}</div>
                 </div>
             `;
 
-            renderWinnerOverlay();
+            renderCanastraWinner();
         }
 
-        function renderWinnerOverlay() {
+        function renderCanastraWinner() {
             let overlay = document.getElementById('winnerOverlay');
             if (!overlay) {
                 overlay = document.createElement('div');
@@ -471,7 +840,7 @@
                 document.body.appendChild(overlay);
             }
 
-            if (gameData.gameOver) {
+            if (canastraData.gameOver && currentGame === 'canastra') {
                 let confetti = '';
                 for (let i = 0; i < 30; i++) {
                     const colors = ['#e94560', '#45a2e9', '#ffd700', '#2ecc71'];
@@ -479,9 +848,9 @@
                 }
                 overlay.innerHTML = `
                     ${confetti}
-                    <div class="winner-text ${gameData.winner}">🏆 ${gameData.winner === 'nos' ? 'NÓS' : 'ELES'} VENCERAM! 🏆</div>
-                    <div class="winner-score">${gameData.nos} × ${gameData.eles}</div>
-                    <button class="btn-primary" style="width:auto;padding:16px 32px;" onclick="resetGame()">NOVO JOGO</button>
+                    <div class="winner-text ${canastraData.winner}">🏆 ${canastraData.winner === 'nos' ? 'NÓS' : 'ELES'} VENCERAM! 🏆</div>
+                    <div class="winner-score">${canastraData.nos} × ${canastraData.eles}</div>
+                    <button class="btn-primary" style="width:auto;padding:16px 32px;" onclick="resetCanastra()">NOVO JOGO</button>
                 `;
                 overlay.classList.add('active');
             } else {
@@ -489,31 +858,64 @@
             }
         }
 
-        function openScoreModal() {
+        function openCanastraSettings() {
+            showModal(`
+                <h2 class="modal-title">⚙️ CONFIGURAÇÕES</h2>
+                
+                <div class="setting-group">
+                    <label class="setting-label">Pontuação máxima para vencer</label>
+                    <input type="number" class="setting-input" id="targetScore" value="${canastraData.targetScore}" min="100" max="50000" inputmode="numeric">
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button class="btn-confirm" onclick="saveCanastraSettings()">Salvar</button>
+                </div>
+            `);
+        }
+
+        function saveCanastraSettings() {
+            const target = parseInt(document.getElementById('targetScore').value) || 3000;
+            canastraData.targetScore = Math.max(100, target);
+            
+            // Recheck winner with new target
+            if (canastraData.nos >= canastraData.targetScore || canastraData.eles >= canastraData.targetScore) {
+                canastraData.gameOver = true;
+                canastraData.winner = canastraData.nos >= canastraData.eles ? 'nos' : 'eles';
+            } else {
+                canastraData.gameOver = false;
+                canastraData.winner = null;
+            }
+            
+            saveCanastra();
+            closeModal();
+            render();
+        }
+
+        function openCanastraScore() {
             showModal(`
                 <h2 class="modal-title">MARCAR RODADA</h2>
 
                 <div class="inputs-row">
                     <div class="team-input-section">
                         <span class="team-input-title nos">NÓS</span>
-                        <input type="number" class="points-input" id="nosPoints" placeholder="0" min="0" max="5000" inputmode="numeric">
+                        <input type="number" class="points-input" id="nosPoints" placeholder="0" min="0" inputmode="numeric">
                     </div>
                     <div class="team-input-section">
                         <span class="team-input-title eles">ELES</span>
-                        <input type="number" class="points-input" id="elesPoints" placeholder="0" min="0" max="5000" inputmode="numeric">
+                        <input type="number" class="points-input" id="elesPoints" placeholder="0" min="0" inputmode="numeric">
                     </div>
                 </div>
 
                 <div class="modal-actions">
                     <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-                    <button class="btn-confirm" onclick="confirmRound()">Confirmar</button>
+                    <button class="btn-confirm" onclick="confirmCanastraRound()">Confirmar</button>
                 </div>
             `);
-
             setTimeout(() => document.getElementById('nosPoints').focus(), 100);
         }
 
-        function confirmRound() {
+        function confirmCanastraRound() {
             const nos = parseInt(document.getElementById('nosPoints').value) || 0;
             const eles = parseInt(document.getElementById('elesPoints').value) || 0;
 
@@ -522,26 +924,18 @@
                 return;
             }
 
-            const round = {
-                id: Date.now(),
-                nos: nos,
-                eles: eles,
-                timestamp: new Date().toLocaleString('pt-BR')
-            };
+            canastraData.history.push({ id: Date.now(), nos, eles });
+            canastraData.nos += nos;
+            canastraData.eles += eles;
 
-            gameData.nos += round.nos;
-            gameData.eles += round.eles;
-            gameData.history.push(round);
-
-            checkWinner();
-            saveGame();
+            checkCanastraWinner();
+            saveCanastra();
             closeModal();
             render();
         }
 
-        function openEdit(index) {
-            const round = gameData.history[index];
-
+        function openCanastraEdit(index) {
+            const round = canastraData.history[index];
             showModal(`
                 <h2 class="modal-title">EDITAR RODADA ${index + 1}</h2>
 
@@ -558,62 +952,496 @@
 
                 <div class="modal-actions">
                     <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
-                    <button class="btn-confirm" onclick="saveEdit(${index})">Salvar</button>
+                    <button class="btn-confirm" onclick="saveCanastraEdit(${index})">Salvar</button>
                 </div>
             `);
         }
 
-        function saveEdit(index) {
+        function saveCanastraEdit(index) {
             const nos = parseInt(document.getElementById('nosPoints').value) || 0;
             const eles = parseInt(document.getElementById('elesPoints').value) || 0;
 
-            gameData.history[index] = {
-                ...gameData.history[index],
-                nos: nos,
-                eles: eles
-            };
-
-            recalculateTotals();
+            canastraData.history[index] = { ...canastraData.history[index], nos, eles };
+            recalculateCanastra();
             closeModal();
         }
 
-        function deleteRound(index) {
+        function deleteCanastraRound(index) {
             if (!confirm('Excluir esta rodada?')) return;
-            gameData.history.splice(index, 1);
-            recalculateTotals();
+            canastraData.history.splice(index, 1);
+            recalculateCanastra();
         }
 
-        function recalculateTotals() {
-            const totals = gameData.history.reduce((acc, r) => ({
+        function recalculateCanastra() {
+            const totals = canastraData.history.reduce((acc, r) => ({
                 nos: acc.nos + r.nos,
                 eles: acc.eles + r.eles
             }), { nos: 0, eles: 0 });
 
-            gameData.nos = totals.nos;
-            gameData.eles = totals.eles;
-            
-            // Quando um dos times passa de 3000, quem tem mais pontos vence
-            if (totals.nos >= TARGET_SCORE || totals.eles >= TARGET_SCORE) {
-                gameData.gameOver = true;
-                gameData.winner = totals.nos >= totals.eles ? 'nos' : 'eles';
+            canastraData.nos = totals.nos;
+            canastraData.eles = totals.eles;
+
+            if (totals.nos >= canastraData.targetScore || totals.eles >= canastraData.targetScore) {
+                canastraData.gameOver = true;
+                canastraData.winner = totals.nos >= totals.eles ? 'nos' : 'eles';
             } else {
-                gameData.gameOver = false;
-                gameData.winner = null;
+                canastraData.gameOver = false;
+                canastraData.winner = null;
             }
 
-            saveGame();
+            saveCanastra();
             render();
         }
 
-        function confirmReset() {
-            if (confirm('Iniciar novo jogo? Todo histórico será apagado.')) resetGame();
+        function confirmCanastraReset() {
+            if (confirm('Iniciar novo jogo?')) resetCanastra();
         }
 
-        function resetGame() {
-            gameData = { nos: 0, eles: 0, history: [], gameOver: false, winner: null };
-            saveGame();
+        function resetCanastra() {
+            canastraData = { 
+                ...canastraData, 
+                nos: 0, 
+                eles: 0, 
+                history: [], 
+                gameOver: false, 
+                winner: null 
+            };
+            saveCanastra();
             render();
         }
+
+        // ============================================
+        // PONTINHO
+        // ============================================
+
+        function renderPontinho() {
+            if (pontinhoData.setup) {
+                renderPontinhoSetup();
+            } else {
+                renderPontinhoGame();
+            }
+        }
+
+        function renderPontinhoSetup() {
+            const playerInputs = Array.from({ length: tempPlayerCount }, (_, i) => 
+                `<input type="text" class="player-name-input" id="player${i}" placeholder="Jogador ${i + 1}" maxlength="15">`
+            ).join('');
+
+            document.getElementById('app').innerHTML = `
+                <div class="header">
+                    <div class="title-row">
+                        <button class="nav-arrow" onclick="switchGame('canastra')">‹</button>
+                        <h1 class="logo pontinho">PONTINHO</h1>
+                        <button class="nav-arrow" onclick="switchGame('canastra')">›</button>
+                    </div>
+                    <div class="target-row">
+                        <span class="target">Quem passar de 99 pega rodinha</span>
+                    </div>
+                </div>
+
+                <div class="setup-players">
+                    <h3>QUANTOS JOGADORES?</h3>
+                    
+                    <div class="player-count-selector">
+                        <button class="count-btn" onclick="changePlayerCount(-1)">−</button>
+                        <span class="count-display">${tempPlayerCount}</span>
+                        <button class="count-btn" onclick="changePlayerCount(1)">+</button>
+                    </div>
+
+                    <div class="player-names-list">
+                        ${playerInputs}
+                    </div>
+
+                    <button class="btn-primary pontinho" onclick="startPontinho()">
+                        INICIAR JOGO
+                    </button>
+                </div>
+            `;
+        }
+
+        function changePlayerCount(delta) {
+            tempPlayerCount = Math.max(2, Math.min(10, tempPlayerCount + delta));
+            renderPontinhoSetup();
+        }
+
+        function startPontinho() {
+            const players = [];
+            for (let i = 0; i < tempPlayerCount; i++) {
+                const input = document.getElementById(`player${i}`);
+                const name = input.value.trim() || `Jogador ${i + 1}`;
+                players.push({ name, score: 0, wheels: 0, eliminated: false });
+            }
+
+            pontinhoData = {
+                players,
+                history: [],
+                gameOver: false,
+                winner: null,
+                setup: false
+            };
+
+            savePontinho();
+            render();
+        }
+
+        function renderPontinhoGame() {
+            const activePlayers = pontinhoData.players.filter(p => !p.eliminated);
+            
+            const playersHTML = pontinhoData.players.map((player, i) => `
+                <div class="player-card ${player.eliminated ? 'eliminated' : ''} ${pontinhoData.winner === i ? 'winner' : ''}">
+                    <div class="player-name">${player.name}</div>
+                    <div class="player-score">${player.score}</div>
+                    ${player.wheels > 0 ? `<div class="player-wheels">🔴 ${player.wheels} rodinha${player.wheels > 1 ? 's' : ''}</div>` : ''}
+                </div>
+            `).join('');
+
+            const historyHTML = pontinhoData.history.length === 0 
+                ? '<div class="empty-history">Nenhuma rodada registrada</div>'
+                : pontinhoData.history.map((round, index) => `
+                    <div class="pontinho-history-item">
+                        <div class="pontinho-history-header">
+                            <span class="history-round">R${index + 1}</span>
+                            <div class="history-actions">
+                                <button class="btn-icon" onclick="openPontinhoEdit(${index})">✏️</button>
+                                <button class="btn-icon delete" onclick="deletePontinhoRound(${index})">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="pontinho-history-scores">
+                            ${round.scores.map((s, i) => {
+                                let chipClass = '';
+                                if (s.points === 0) chipClass = 'winner';
+                                else if (s.gotWheel) chipClass = 'wheel';
+                                return `<span class="pontinho-score-chip ${chipClass}">${pontinhoData.players[i]?.name?.substring(0,6) || 'J'+(i+1)}: +${s.points}</span>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                `).join('');
+
+            document.getElementById('app').innerHTML = `
+                <div class="header">
+                    <div class="title-row">
+                        <button class="nav-arrow" onclick="switchGame('canastra')">‹</button>
+                        <h1 class="logo pontinho">PONTINHO</h1>
+                        <button class="nav-arrow" onclick="switchGame('canastra')">›</button>
+                    </div>
+                    <div class="target-row">
+                        <span class="target">${activePlayers.length} jogador${activePlayers.length !== 1 ? 'es' : ''} ativo${activePlayers.length !== 1 ? 's' : ''}</span>
+                    </div>
+                </div>
+
+                <div class="players-grid">
+                    ${playersHTML}
+                </div>
+
+                <button class="btn-primary pontinho" onclick="openPontinhoScore()" ${pontinhoData.gameOver ? 'disabled' : ''}>
+                    ✚ MARCAR PONTOS
+                </button>
+
+                <div class="history-section">
+                    <div class="history-title">
+                        HISTÓRICO
+                        ${pontinhoData.history.length > 0 ? '<button class="btn-reset" onclick="confirmPontinhoReset()">NOVO JOGO</button>' : ''}
+                    </div>
+                    <div class="history-list">${historyHTML}</div>
+                </div>
+            `;
+
+            renderPontinhoWinner();
+        }
+
+        function renderPontinhoWinner() {
+            let overlay = document.getElementById('winnerOverlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'winnerOverlay';
+                overlay.className = 'winner-overlay';
+                document.body.appendChild(overlay);
+            }
+
+            if (pontinhoData.gameOver && currentGame === 'pontinho' && pontinhoData.winner !== null) {
+                const winner = pontinhoData.players[pontinhoData.winner];
+                
+                // Lista dos perdedores (todos exceto o vencedor)
+                const losers = pontinhoData.players
+                    .filter((p, i) => i !== pontinhoData.winner)
+                    .sort((a, b) => a.wheels - b.wheels);
+
+                let confetti = '';
+                for (let i = 0; i < 30; i++) {
+                    const colors = ['#f1c40f', '#e74c3c', '#2ecc71', '#3498db'];
+                    confetti += `<div class="confetti" style="left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*4)]};animation-delay:${Math.random()*3}s;"></div>`;
+                }
+
+                const losersHTML = losers.map(p => `
+                    <div class="ranking-item">
+                        <span>${p.name}</span>
+                        <span class="ranking-wheels">${p.wheels} rodinha${p.wheels !== 1 ? 's' : ''}</span>
+                    </div>
+                `).join('');
+
+                overlay.innerHTML = `
+                    ${confetti}
+                    <div class="winner-text pontinho">🏆 ${winner.name.toUpperCase()} VENCEU! 🏆</div>
+                    
+                    <div class="final-ranking">
+                        <div class="ranking-title">RODINHAS DOS JOGADORES</div>
+                        ${losersHTML}
+                    </div>
+                    
+                    <button class="btn-primary pontinho" style="width:auto;padding:16px 32px;margin-top:20px;" onclick="resetPontinho()">NOVO JOGO</button>
+                `;
+                overlay.classList.add('active');
+            } else if (currentGame === 'pontinho') {
+                overlay.classList.remove('active');
+            }
+        }
+
+        function openPontinhoScore() {
+            const inputsHTML = pontinhoData.players.map((player, i) => `
+                <div class="team-input-section" ${player.eliminated ? 'style="opacity:0.4;"' : ''}>
+                    <span class="team-input-title" style="color: ${player.eliminated ? '#666' : '#f1c40f'};">${player.name}</span>
+                    <input type="number" class="points-input" id="playerScore${i}" placeholder="0" min="0" inputmode="numeric" ${player.eliminated ? 'disabled' : ''}>
+                </div>
+            `).join('');
+
+            showModal(`
+                <h2 class="modal-title">MARCAR RODADA</h2>
+                <div class="inputs-row" style="grid-template-columns: repeat(2, 1fr);">
+                    ${inputsHTML}
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button class="btn-confirm" onclick="confirmPontinhoRound()">Confirmar</button>
+                </div>
+            `);
+        }
+
+        function confirmPontinhoRound() {
+            const scores = [];
+            let zeroCount = 0;
+            let zeroPlayerIndex = -1;
+
+            for (let i = 0; i < pontinhoData.players.length; i++) {
+                const input = document.getElementById(`playerScore${i}`);
+                const points = parseInt(input?.value) || 0;
+                if (points === 0 && !pontinhoData.players[i].eliminated) {
+                    zeroCount++;
+                    zeroPlayerIndex = i;
+                }
+                scores.push({ points, gotWheel: false });
+            }
+
+            // Deve ter ao menos um jogador com 0 pontos
+            if (zeroCount === 0) {
+                alert('Ao menos um jogador deve fazer 0 pontos (vencedor da rodada)!');
+                return;
+            }
+
+            // Apply scores
+            for (let i = 0; i < pontinhoData.players.length; i++) {
+                if (!pontinhoData.players[i].eliminated) {
+                    pontinhoData.players[i].score += scores[i].points;
+                }
+            }
+
+            // Check for wheels
+            processWheels(scores);
+
+            // Add to history
+            pontinhoData.history.push({ id: Date.now(), scores });
+
+            // Check winner - só finaliza se tiver apenas 1 jogador sem rodinha E a rodada teve apenas 1 vencedor
+            const playersWithoutWheels = pontinhoData.players.filter(p => p.wheels === 0);
+            
+            if (playersWithoutWheels.length === 1 && zeroCount === 1) {
+                // Jogo finaliza - o jogador sem rodinha vence
+                const winnerIndex = pontinhoData.players.findIndex(p => p.wheels === 0);
+                pontinhoData.gameOver = true;
+                pontinhoData.winner = winnerIndex;
+                
+                pontinhoData.players.forEach((p, i) => {
+                    if (i !== winnerIndex) {
+                        p.eliminated = true;
+                    }
+                });
+            }
+
+            savePontinho();
+            closeModal();
+            render();
+        }
+
+        function processWheels(scores) {
+            let changed = true;
+            
+            while (changed) {
+                changed = false;
+                
+                for (let i = 0; i < pontinhoData.players.length; i++) {
+                    const player = pontinhoData.players[i];
+                    
+                    if (!player.eliminated && player.score >= 100) {
+                        // Got a wheel!
+                        player.wheels++;
+                        scores[i].gotWheel = true;
+                        
+                        // Find the highest score below 100 among non-eliminated players
+                        const validScores = pontinhoData.players
+                            .filter((p, idx) => !p.eliminated && idx !== i && p.score < 100)
+                            .map(p => p.score);
+                        
+                        if (validScores.length > 0) {
+                            player.score = Math.max(...validScores);
+                        } else {
+                            // If everyone else is also >= 100, set to 0
+                            player.score = 0;
+                        }
+                        
+                        changed = true;
+                    }
+                }
+            }
+        }
+
+        function checkPontinhoWinner() {
+            // Conta quantos jogadores ainda não fizeram nenhuma rodinha
+            const playersWithoutWheels = pontinhoData.players.filter(p => p.wheels === 0);
+            
+            // Se sobrou apenas 1 jogador sem rodinha, ele vence
+            if (playersWithoutWheels.length === 1) {
+                const winnerIndex = pontinhoData.players.findIndex(p => p.wheels === 0);
+                pontinhoData.gameOver = true;
+                pontinhoData.winner = winnerIndex;
+                
+                // Marca os outros como eliminados
+                pontinhoData.players.forEach((p, i) => {
+                    if (i !== winnerIndex) {
+                        p.eliminated = true;
+                    }
+                });
+            }
+        }
+
+        function openPontinhoEdit(index) {
+            const round = pontinhoData.history[index];
+            
+            const inputsHTML = pontinhoData.players.map((player, i) => `
+                <div class="team-input-section">
+                    <span class="team-input-title" style="color: #f1c40f;">${player.name}</span>
+                    <input type="number" class="points-input" id="playerScore${i}" value="${round.scores[i]?.points || 0}" min="0" inputmode="numeric">
+                </div>
+            `).join('');
+
+            showModal(`
+                <h2 class="modal-title">EDITAR RODADA ${index + 1}</h2>
+                <div class="inputs-row" style="grid-template-columns: repeat(2, 1fr);">
+                    ${inputsHTML}
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button class="btn-confirm" onclick="savePontinhoEdit(${index})">Salvar</button>
+                </div>
+            `);
+        }
+
+        function savePontinhoEdit(index) {
+            const scores = [];
+            for (let i = 0; i < pontinhoData.players.length; i++) {
+                const points = parseInt(document.getElementById(`playerScore${i}`)?.value) || 0;
+                scores.push({ points, gotWheel: false });
+            }
+            pontinhoData.history[index].scores = scores;
+            recalculatePontinho();
+            closeModal();
+        }
+
+        function deletePontinhoRound(index) {
+            if (!confirm('Excluir esta rodada?')) return;
+            pontinhoData.history.splice(index, 1);
+            recalculatePontinho();
+        }
+
+        function recalculatePontinho() {
+            // Reset all players
+            pontinhoData.players.forEach(p => {
+                p.score = 0;
+                p.wheels = 0;
+                p.eliminated = false;
+            });
+            pontinhoData.gameOver = false;
+            pontinhoData.winner = null;
+
+            // Replay all rounds
+            for (const round of pontinhoData.history) {
+                // Conta quantos fizeram 0 na rodada
+                let zeroCount = 0;
+                round.scores.forEach((s, i) => {
+                    if (s.points === 0 && !pontinhoData.players[i].eliminated) {
+                        zeroCount++;
+                    }
+                });
+
+                // Apply scores
+                for (let i = 0; i < pontinhoData.players.length; i++) {
+                    if (!pontinhoData.players[i].eliminated) {
+                        pontinhoData.players[i].score += round.scores[i]?.points || 0;
+                    }
+                }
+
+                // Reset gotWheel flags
+                round.scores.forEach(s => s.gotWheel = false);
+
+                // Process wheels
+                processWheels(round.scores);
+
+                // Check winner - só finaliza se tiver apenas 1 jogador sem rodinha E a rodada teve apenas 1 vencedor
+                const playersWithoutWheels = pontinhoData.players.filter(p => p.wheels === 0);
+                
+                if (playersWithoutWheels.length === 1 && zeroCount === 1) {
+                    const winnerIndex = pontinhoData.players.findIndex(p => p.wheels === 0);
+                    pontinhoData.gameOver = true;
+                    pontinhoData.winner = winnerIndex;
+                    
+                    pontinhoData.players.forEach((p, i) => {
+                        if (i !== winnerIndex) {
+                            p.eliminated = true;
+                        }
+                    });
+                    break;
+                }
+            }
+
+            savePontinho();
+            render();
+        }
+
+        function confirmPontinhoReset() {
+            if (confirm('Iniciar novo jogo?')) resetPontinho();
+        }
+
+        function resetPontinho() {
+            pontinhoData = {
+                players: [],
+                history: [],
+                gameOver: false,
+                winner: null,
+                setup: true
+            };
+            tempPlayerCount = 4;
+            savePontinho();
+            
+            // Remove winner overlay
+            const overlay = document.getElementById('winnerOverlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
+            
+            render();
+        }
+
+        // ============================================
+        // MODAL HELPERS
+        // ============================================
 
         function showModal(content) {
             let overlay = document.getElementById('modalOverlay');
@@ -633,12 +1461,26 @@
             if (overlay) overlay.classList.remove('active');
         }
 
+        // ============================================
+        // MAIN RENDER
+        // ============================================
+
+        function render() {
+            if (currentGame === 'canastra') {
+                renderCanastra();
+            } else {
+                renderPontinho();
+            }
+        }
+
+        // Service Worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').catch(() => {});
         }
 
+        // Init
         document.addEventListener('DOMContentLoaded', () => {
-            loadGame();
+            loadGames();
             render();
         });
     </script>

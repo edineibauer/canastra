@@ -1,7 +1,7 @@
 {
-  "name": "Canastra Score",
-  "short_name": "Canastra",
-  "description": "Marcador de pontos para Canastra",
+  "name": "Marcador de Pontos",
+  "short_name": "Marcador",
+  "description": "Marcador de pontos para Canastra e Pontinho",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1a1a2e",

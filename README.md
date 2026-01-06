@@ -1,22 +1,27 @@
-# 🃏 Canastra Score - PWA
+# 🎴 Marcador de Pontos - PWA
 
-Marcador de pontos simples para Canastra - 100% offline.
+Marcador de pontos para **Canastra** e **Pontinho** - 100% offline.
 
 ## 📱 Funcionalidades
 
-- ✅ Placar "Nós vs Eles" até 3000 pontos
-- ✅ Histórico de todas as rodadas
-- ✅ Editar e excluir rodadas
-- ✅ Persistência local (dados salvos no dispositivo)
-- ✅ 100% offline após instalado
-- ✅ Instalável como app (PWA)
+### Canastra
+- Placar "Nós vs Eles"
+- Configuração de pontuação máxima (padrão 3000)
+- Histórico com edição/exclusão
+- Vence quem tiver mais pontos ao passar do limite
+
+### Pontinho
+- 2 a 10 jogadores
+- Nome personalizado para cada jogador
+- Sistema de rodinhas (passa de 99 = pega rodinha)
+- Último jogador abaixo de 100 pontos vence
+- Ranking final com contagem de rodinhas
 
 ## 🚀 Deploy
 
 ### GitHub Pages
-1. Crie um repositório no GitHub
-2. Upload dos arquivos
-3. Settings > Pages > Deploy from main
+1. Upload dos arquivos para um repositório
+2. Settings > Pages > Deploy from main
 
 ### Netlify/Vercel
 Arraste a pasta para o painel.
@@ -26,9 +31,9 @@ Arraste a pasta para o painel.
 - `index.html` - App completo
 - `manifest.json` - Config PWA
 - `sw.js` - Service Worker
-- `icon-192.png` / `icon-512.png` - Ícones
+- `icon-*.png` - Ícones
 
-## 📲 Instalar no Celular
+## 📲 Instalar
 
-1. Acesse pelo Chrome
+1. Acesse pelo Chrome no celular
 2. Menu (⋮) > "Adicionar à tela inicial"

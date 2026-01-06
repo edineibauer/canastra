@@ -291,19 +291,25 @@
             font-weight: 700;
         }
 
+        .inputs-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
         .team-input-section {
             background: rgba(255,255,255,0.03);
             border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
+            padding: 12px;
         }
 
         .team-input-title {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.1rem;
+            font-size: 1rem;
             letter-spacing: 2px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             display: block;
+            text-align: center;
         }
 
         .team-input-title.nos { color: #e94560; }
@@ -311,7 +317,7 @@
 
         .points-input {
             width: 100%;
-            padding: 14px;
+            padding: 14px 8px;
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 10px;
@@ -395,12 +401,10 @@
 
         function checkWinner() {
             if (!gameData.gameOver) {
-                if (gameData.nos >= TARGET_SCORE) {
+                // Quando um dos times passa de 3000, quem tem mais pontos vence
+                if (gameData.nos >= TARGET_SCORE || gameData.eles >= TARGET_SCORE) {
                     gameData.gameOver = true;
-                    gameData.winner = 'nos';
-                } else if (gameData.eles >= TARGET_SCORE) {
-                    gameData.gameOver = true;
-                    gameData.winner = 'eles';
+                    gameData.winner = gameData.nos >= gameData.eles ? 'nos' : 'eles';
                 }
             }
         }
@@ -489,14 +493,15 @@
             showModal(`
                 <h2 class="modal-title">MARCAR RODADA</h2>
 
-                <div class="team-input-section">
-                    <span class="team-input-title nos">PONTOS NÓS</span>
-                    <input type="number" class="points-input" id="nosPoints" placeholder="0" min="0" max="5000" inputmode="numeric">
-                </div>
-
-                <div class="team-input-section">
-                    <span class="team-input-title eles">PONTOS ELES</span>
-                    <input type="number" class="points-input" id="elesPoints" placeholder="0" min="0" max="5000" inputmode="numeric">
+                <div class="inputs-row">
+                    <div class="team-input-section">
+                        <span class="team-input-title nos">NÓS</span>
+                        <input type="number" class="points-input" id="nosPoints" placeholder="0" min="0" max="5000" inputmode="numeric">
+                    </div>
+                    <div class="team-input-section">
+                        <span class="team-input-title eles">ELES</span>
+                        <input type="number" class="points-input" id="elesPoints" placeholder="0" min="0" max="5000" inputmode="numeric">
+                    </div>
                 </div>
 
                 <div class="modal-actions">
@@ -540,14 +545,15 @@
             showModal(`
                 <h2 class="modal-title">EDITAR RODADA ${index + 1}</h2>
 
-                <div class="team-input-section">
-                    <span class="team-input-title nos">PONTOS NÓS</span>
-                    <input type="number" class="points-input" id="nosPoints" value="${round.nos}" min="0" inputmode="numeric">
-                </div>
-
-                <div class="team-input-section">
-                    <span class="team-input-title eles">PONTOS ELES</span>
-                    <input type="number" class="points-input" id="elesPoints" value="${round.eles}" min="0" inputmode="numeric">
+                <div class="inputs-row">
+                    <div class="team-input-section">
+                        <span class="team-input-title nos">NÓS</span>
+                        <input type="number" class="points-input" id="nosPoints" value="${round.nos}" min="0" inputmode="numeric">
+                    </div>
+                    <div class="team-input-section">
+                        <span class="team-input-title eles">ELES</span>
+                        <input type="number" class="points-input" id="elesPoints" value="${round.eles}" min="0" inputmode="numeric">
+                    </div>
                 </div>
 
                 <div class="modal-actions">
@@ -585,8 +591,15 @@
 
             gameData.nos = totals.nos;
             gameData.eles = totals.eles;
-            gameData.gameOver = totals.nos >= TARGET_SCORE || totals.eles >= TARGET_SCORE;
-            gameData.winner = totals.nos >= TARGET_SCORE ? 'nos' : (totals.eles >= TARGET_SCORE ? 'eles' : null);
+            
+            // Quando um dos times passa de 3000, quem tem mais pontos vence
+            if (totals.nos >= TARGET_SCORE || totals.eles >= TARGET_SCORE) {
+                gameData.gameOver = true;
+                gameData.winner = totals.nos >= totals.eles ? 'nos' : 'eles';
+            } else {
+                gameData.gameOver = false;
+                gameData.winner = null;
+            }
 
             saveGame();
             render();

@@ -114,6 +114,12 @@
             background-clip: text;
         }
 
+        .logo.truco {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
         .target-row {
             display: flex;
             align-items: center;
@@ -237,6 +243,11 @@
             background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
         }
         .btn-primary.jogo7:hover { box-shadow: 0 10px 30px rgba(26, 188, 156, 0.4); }
+
+        .btn-primary.truco {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+        .btn-primary.truco:hover { box-shadow: 0 10px 30px rgba(52, 152, 219, 0.4); }
 
         .history-section {
             background: rgba(255,255,255,0.03);
@@ -505,6 +516,7 @@
         .winner-text.pontinho { color: #f1c40f; }
         .winner-text.cacheta { color: #9b59b6; }
         .winner-text.jogo7 { color: #1abc9c; }
+        .winner-text.truco { color: #3498db; }
 
         @keyframes winnerPulse {
             0%, 100% { transform: scale(1); opacity: 1; }
@@ -936,6 +948,81 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+
+        /* Truco Styles */
+        .team-card.truco-nos { border-color: rgba(52, 152, 219, 0.3); }
+        .team-card.truco-eles { border-color: rgba(231, 76, 60, 0.3); }
+        .team-card.truco-nos .team-name { color: #3498db; }
+        .team-card.truco-eles .team-name { color: #e74c3c; }
+        .team-card.truco-nos .progress-fill { background: linear-gradient(90deg, #3498db, #5dade2); }
+        .team-card.truco-eles .progress-fill { background: linear-gradient(90deg, #e74c3c, #ec7063); }
+
+        .truco-quick-scores {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .truco-score-btn {
+            flex: 1;
+            min-width: 60px;
+            max-width: 80px;
+            padding: 12px 8px;
+            border: 2px solid rgba(52, 152, 219, 0.3);
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 10px;
+            color: #3498db;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .truco-score-btn:hover {
+            background: rgba(52, 152, 219, 0.2);
+            border-color: rgba(52, 152, 219, 0.5);
+        }
+
+        .truco-score-btn.eles {
+            border-color: rgba(231, 76, 60, 0.3);
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .truco-score-btn.eles:hover {
+            background: rgba(231, 76, 60, 0.2);
+            border-color: rgba(231, 76, 60, 0.5);
+        }
+
+        .truco-score-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .truco-score-label {
+            font-size: 0.6rem;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        .truco-section-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            color: #888;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .truco-section-title.nos { color: #3498db; }
+        .truco-section-title.eles { color: #e74c3c; }
+
+        .history-score.truco-nos { color: #3498db; }
+        .history-score.truco-eles { color: #e74c3c; }
     </style>
 </head>
 <body>
@@ -987,6 +1074,16 @@
             initialScore: 15
         };
 
+        // Truco State
+        let trucoData = {
+            nos: 0,
+            eles: 0,
+            history: [],
+            gameOver: false,
+            winner: null,
+            targetScore: 12
+        };
+
         let tempPlayerCount = 4;
         let tempCachetaPlayerCount = 4;
         let tempJogo7PlayerCount = 4;
@@ -1013,6 +1110,12 @@
             if (savedJogo7) {
                 jogo7Data = JSON.parse(savedJogo7);
             }
+
+            const savedTruco = localStorage.getItem('truco_game');
+            if (savedTruco) {
+                const parsed = JSON.parse(savedTruco);
+                trucoData = { ...trucoData, ...parsed };
+            }
         }
 
         function saveCanastra() {
@@ -1031,8 +1134,12 @@
             localStorage.setItem('jogo7_game', JSON.stringify(jogo7Data));
         }
 
+        function saveTruco() {
+            localStorage.setItem('truco_game', JSON.stringify(trucoData));
+        }
+
         function switchGame(direction) {
-            const games = ['canastra', 'pontinho', 'cacheta', 'jogo7'];
+            const games = ['canastra', 'pontinho', 'cacheta', 'jogo7', 'truco'];
             const currentIndex = games.indexOf(currentGame);
             let newIndex;
 
@@ -2765,6 +2872,274 @@
         }
 
         // ============================================
+        // TRUCO
+        // ============================================
+
+        function checkTrucoWinner() {
+            if (!trucoData.gameOver) {
+                if (trucoData.nos >= trucoData.targetScore || trucoData.eles >= trucoData.targetScore) {
+                    trucoData.gameOver = true;
+                    trucoData.winner = trucoData.nos >= trucoData.eles ? 'nos' : 'eles';
+                }
+            }
+        }
+
+        function renderTruco() {
+            const nosProgress = Math.min((trucoData.nos / trucoData.targetScore) * 100, 100);
+            const elesProgress = Math.min((trucoData.eles / trucoData.targetScore) * 100, 100);
+
+            const historyHTML = trucoData.history.length === 0
+                ? '<div class="empty-history">Nenhuma rodada registrada</div>'
+                : trucoData.history.map((round, index) => `
+                    <div class="history-item">
+                        <span class="history-round">R${index + 1}</span>
+                        <div class="history-scores">
+                            <span class="history-score truco-nos">+${round.nos}</span>
+                            <span class="history-score truco-eles">+${round.eles}</span>
+                        </div>
+                        <div class="history-actions">
+                            <button class="btn-icon" onclick="openTrucoEdit(${index})">✏️</button>
+                            <button class="btn-icon delete" onclick="deleteTrucoRound(${index})">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+
+            document.getElementById('app').innerHTML = `
+                <div class="header">
+                    <div class="title-row">
+                        <button class="nav-arrow" onclick="switchGame('prev')">‹</button>
+                        <h1 class="logo truco">TRUCO</h1>
+                        <button class="nav-arrow" onclick="switchGame('next')">›</button>
+                    </div>
+                    <div class="target-row">
+                        <span class="target">Primeiro a ${trucoData.targetScore} pontos</span>
+                        <button class="btn-settings" onclick="openTrucoSettings()">⚙️</button>
+                    </div>
+                </div>
+
+                <div class="scoreboard">
+                    <div class="team-card truco-nos ${trucoData.winner === 'nos' ? 'winner' : ''}">
+                        <div class="team-name">NÓS</div>
+                        <div class="team-score">${trucoData.nos}</div>
+                        <div class="progress-bar"><div class="progress-fill" style="width: ${nosProgress}%"></div></div>
+                    </div>
+                    <div class="team-card truco-eles ${trucoData.winner === 'eles' ? 'winner' : ''}">
+                        <div class="team-name">ELES</div>
+                        <div class="team-score">${trucoData.eles}</div>
+                        <div class="progress-bar"><div class="progress-fill" style="width: ${elesProgress}%"></div></div>
+                    </div>
+                </div>
+
+                ${!trucoData.gameOver ? `
+                    <div class="truco-section-title nos">NÓS GANHARAM</div>
+                    <div class="truco-quick-scores">
+                        <button class="truco-score-btn" onclick="trucoQuickScore('nos', 1)">
+                            <div class="truco-score-value">+1</div>
+                        </button>
+                        <button class="truco-score-btn" onclick="trucoQuickScore('nos', 3)">
+                            <div class="truco-score-value">+3</div>
+                            <div class="truco-score-label">TRUCO</div>
+                        </button>
+                        <button class="truco-score-btn" onclick="trucoQuickScore('nos', 6)">
+                            <div class="truco-score-value">+6</div>
+                            <div class="truco-score-label">SEIS</div>
+                        </button>
+                        <button class="truco-score-btn" onclick="trucoQuickScore('nos', 9)">
+                            <div class="truco-score-value">+9</div>
+                            <div class="truco-score-label">NOVE</div>
+                        </button>
+                        <button class="truco-score-btn" onclick="trucoQuickScore('nos', 12)">
+                            <div class="truco-score-value">+12</div>
+                            <div class="truco-score-label">DOZE</div>
+                        </button>
+                    </div>
+
+                    <div class="truco-section-title eles">ELES GANHARAM</div>
+                    <div class="truco-quick-scores">
+                        <button class="truco-score-btn eles" onclick="trucoQuickScore('eles', 1)">
+                            <div class="truco-score-value">+1</div>
+                        </button>
+                        <button class="truco-score-btn eles" onclick="trucoQuickScore('eles', 3)">
+                            <div class="truco-score-value">+3</div>
+                            <div class="truco-score-label">TRUCO</div>
+                        </button>
+                        <button class="truco-score-btn eles" onclick="trucoQuickScore('eles', 6)">
+                            <div class="truco-score-value">+6</div>
+                            <div class="truco-score-label">SEIS</div>
+                        </button>
+                        <button class="truco-score-btn eles" onclick="trucoQuickScore('eles', 9)">
+                            <div class="truco-score-value">+9</div>
+                            <div class="truco-score-label">NOVE</div>
+                        </button>
+                        <button class="truco-score-btn eles" onclick="trucoQuickScore('eles', 12)">
+                            <div class="truco-score-value">+12</div>
+                            <div class="truco-score-label">DOZE</div>
+                        </button>
+                    </div>
+                ` : ''}
+
+                <div class="history-section">
+                    <div class="history-title">
+                        HISTÓRICO
+                        ${trucoData.history.length > 0 ? '<button class="btn-reset" onclick="confirmTrucoReset()">NOVO JOGO</button>' : ''}
+                    </div>
+                    <div class="history-list">${historyHTML}</div>
+                </div>
+            `;
+
+            renderTrucoWinner();
+        }
+
+        function trucoQuickScore(team, points) {
+            const round = { id: Date.now(), nos: 0, eles: 0 };
+            round[team] = points;
+
+            trucoData.history.push(round);
+            trucoData[team] += points;
+
+            checkTrucoWinner();
+            saveTruco();
+            render();
+        }
+
+        function renderTrucoWinner() {
+            let overlay = document.getElementById('winnerOverlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'winnerOverlay';
+                overlay.className = 'winner-overlay';
+                document.body.appendChild(overlay);
+            }
+
+            if (trucoData.gameOver && currentGame === 'truco') {
+                let confetti = '';
+                for (let i = 0; i < 30; i++) {
+                    const colors = ['#3498db', '#e74c3c', '#ffd700', '#2ecc71'];
+                    confetti += `<div class="confetti" style="left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*4)]};animation-delay:${Math.random()*3}s;"></div>`;
+                }
+                overlay.innerHTML = `
+                    ${confetti}
+                    <div class="winner-text truco">🏆 ${trucoData.winner === 'nos' ? 'NÓS' : 'ELES'} VENCERAM! 🏆</div>
+                    <div class="winner-score">${trucoData.nos} × ${trucoData.eles}</div>
+                    <button class="btn-primary truco" style="width:auto;padding:16px 32px;" onclick="resetTruco()">NOVO JOGO</button>
+                `;
+                overlay.classList.add('active');
+            } else {
+                overlay.classList.remove('active');
+            }
+        }
+
+        function openTrucoSettings() {
+            showModal(`
+                <h2 class="modal-title">⚙️ CONFIGURAÇÕES</h2>
+
+                <div class="setting-group">
+                    <label class="setting-label">Pontuação máxima para vencer</label>
+                    <input type="number" class="setting-input" id="trucoTargetScore" value="${trucoData.targetScore}" min="1" max="24" inputmode="numeric">
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button class="btn-confirm" onclick="saveTrucoSettings()">Salvar</button>
+                </div>
+            `);
+        }
+
+        function saveTrucoSettings() {
+            const target = parseInt(document.getElementById('trucoTargetScore').value) || 12;
+            trucoData.targetScore = Math.max(1, target);
+
+            // Recheck winner with new target
+            if (trucoData.nos >= trucoData.targetScore || trucoData.eles >= trucoData.targetScore) {
+                trucoData.gameOver = true;
+                trucoData.winner = trucoData.nos >= trucoData.eles ? 'nos' : 'eles';
+            } else {
+                trucoData.gameOver = false;
+                trucoData.winner = null;
+            }
+
+            saveTruco();
+            closeModal();
+            render();
+        }
+
+        function openTrucoEdit(index) {
+            const round = trucoData.history[index];
+            showModal(`
+                <h2 class="modal-title">EDITAR RODADA ${index + 1}</h2>
+
+                <div class="inputs-row">
+                    <div class="team-input-section">
+                        <span class="team-input-title" style="color:#3498db;">NÓS</span>
+                        <input type="number" class="points-input" id="trucoNosPoints" value="${round.nos}" min="0" inputmode="numeric">
+                    </div>
+                    <div class="team-input-section">
+                        <span class="team-input-title" style="color:#e74c3c;">ELES</span>
+                        <input type="number" class="points-input" id="trucoElesPoints" value="${round.eles}" min="0" inputmode="numeric">
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button class="btn-confirm" onclick="saveTrucoEdit(${index})">Salvar</button>
+                </div>
+            `);
+        }
+
+        function saveTrucoEdit(index) {
+            const nos = parseInt(document.getElementById('trucoNosPoints').value) || 0;
+            const eles = parseInt(document.getElementById('trucoElesPoints').value) || 0;
+
+            trucoData.history[index] = { ...trucoData.history[index], nos, eles };
+            recalculateTruco();
+            closeModal();
+        }
+
+        function deleteTrucoRound(index) {
+            if (!confirm('Excluir esta rodada?')) return;
+            trucoData.history.splice(index, 1);
+            recalculateTruco();
+        }
+
+        function recalculateTruco() {
+            const totals = trucoData.history.reduce((acc, r) => ({
+                nos: acc.nos + r.nos,
+                eles: acc.eles + r.eles
+            }), { nos: 0, eles: 0 });
+
+            trucoData.nos = totals.nos;
+            trucoData.eles = totals.eles;
+
+            if (totals.nos >= trucoData.targetScore || totals.eles >= trucoData.targetScore) {
+                trucoData.gameOver = true;
+                trucoData.winner = totals.nos >= totals.eles ? 'nos' : 'eles';
+            } else {
+                trucoData.gameOver = false;
+                trucoData.winner = null;
+            }
+
+            saveTruco();
+            render();
+        }
+
+        function confirmTrucoReset() {
+            if (confirm('Iniciar novo jogo?')) resetTruco();
+        }
+
+        function resetTruco() {
+            trucoData = {
+                ...trucoData,
+                nos: 0,
+                eles: 0,
+                history: [],
+                gameOver: false,
+                winner: null
+            };
+            saveTruco();
+            render();
+        }
+
+        // ============================================
         // MODAL HELPERS
         // ============================================
 
@@ -2799,6 +3174,8 @@
                 renderCacheta();
             } else if (currentGame === 'jogo7') {
                 renderJogo7();
+            } else if (currentGame === 'truco') {
+                renderTruco();
             }
         }
 

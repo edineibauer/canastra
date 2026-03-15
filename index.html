@@ -3366,7 +3366,7 @@
             const game = finishedGames[gameType][index];
             if (!game) return;
 
-            if (!confirm('Restaurar este jogo? O jogo atual será substituído.')) return;
+            if (!confirm('Restaurar este jogo para edição? O jogo atual será substituído.')) return;
 
             // Remove winner overlay first
             const overlay = document.getElementById('winnerOverlay');
@@ -3374,25 +3374,30 @@
                 overlay.classList.remove('active');
             }
 
+            // Restore game but reset gameOver so user can edit and continue
             switch (gameType) {
                 case 'canastra':
-                    canastraData = { ...canastraData, ...game };
+                    canastraData = { ...canastraData, ...game, gameOver: false, winner: null };
                     saveCanastra();
                     break;
                 case 'pontinho':
-                    pontinhoData = { ...game };
+                    pontinhoData = { ...game, gameOver: false, winner: null };
+                    // Reset eliminated status so players can continue
+                    pontinhoData.players.forEach(p => p.eliminated = false);
                     savePontinho();
                     break;
                 case 'cacheta':
-                    cachetaData = { ...cachetaData, ...game };
+                    cachetaData = { ...cachetaData, ...game, gameOver: false, winner: null };
+                    // Reset eliminated status so players can continue
+                    cachetaData.players.forEach(p => p.eliminated = false);
                     saveCacheta();
                     break;
                 case 'jogo7':
-                    jogo7Data = { ...jogo7Data, ...game };
+                    jogo7Data = { ...jogo7Data, ...game, gameOver: false, winner: null };
                     saveJogo7();
                     break;
                 case 'truco':
-                    trucoData = { ...trucoData, ...game };
+                    trucoData = { ...trucoData, ...game, gameOver: false, winner: null };
                     saveTruco();
                     break;
             }

@@ -1802,14 +1802,6 @@
                         player.wheels++;
                         scores[i].gotWheel = true;
 
-                        // Check if player is eliminated (3 wheels)
-                        if (player.wheels >= 3) {
-                            player.eliminated = true;
-                            player.score = 0;
-                            changed = true;
-                            continue;
-                        }
-
                         // Find the highest score below 100 among active players
                         const validScores = pontinhoData.players
                             .filter((p, idx) => !p.eliminated && !p.gaveUp && idx !== i && p.score < 100)
@@ -1829,17 +1821,20 @@
         }
 
         function checkAndFinalizeRound() {
-            // Check winner - game ends when only 1 active player remains
-            const activePlayers = pontinhoData.players.filter(p => !p.eliminated && !p.gaveUp);
+            // Check winner - game ends when only 1 player has 0 wheels (and hasn't given up)
+            const playersWithoutWheels = pontinhoData.players.filter(p => !p.gaveUp && p.wheels === 0);
 
-            if (activePlayers.length === 1) {
-                const winnerIndex = pontinhoData.players.findIndex(p => !p.eliminated && !p.gaveUp);
+            if (playersWithoutWheels.length === 1) {
+                const winnerIndex = pontinhoData.players.findIndex(p => !p.gaveUp && p.wheels === 0);
                 pontinhoData.gameOver = true;
                 pontinhoData.winner = winnerIndex;
-            } else if (activePlayers.length === 0) {
-                // Edge case: all players eliminated simultaneously
-                pontinhoData.gameOver = true;
-                pontinhoData.winner = null;
+
+                // Mark others as eliminated for display purposes
+                pontinhoData.players.forEach((p, i) => {
+                    if (i !== winnerIndex) {
+                        p.eliminated = true;
+                    }
+                });
             }
         }
 
@@ -2023,23 +2018,11 @@
                 // Process wheels
                 processWheels(round.scores);
 
-                // Check winner
+                // Check winner - game ends when only 1 player has 0 wheels
                 const playersWithoutWheels = pontinhoData.players.filter(p => p.wheels === 0 && !p.gaveUp);
-                const activePlayers = pontinhoData.players.filter(p => !p.eliminated && !p.gaveUp);
 
-                if (playersWithoutWheels.length === 1 && zeroCount === 1) {
+                if (playersWithoutWheels.length === 1) {
                     const winnerIndex = pontinhoData.players.findIndex(p => p.wheels === 0 && !p.gaveUp);
-                    pontinhoData.gameOver = true;
-                    pontinhoData.winner = winnerIndex;
-
-                    pontinhoData.players.forEach((p, i) => {
-                        if (i !== winnerIndex) {
-                            p.eliminated = true;
-                        }
-                    });
-                    break;
-                } else if (activePlayers.length === 1) {
-                    const winnerIndex = pontinhoData.players.findIndex(p => !p.eliminated && !p.gaveUp);
                     pontinhoData.gameOver = true;
                     pontinhoData.winner = winnerIndex;
 

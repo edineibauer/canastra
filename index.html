@@ -1783,7 +1783,7 @@
             closeModal();
 
             // Check and finalize round
-            checkAndFinalizeRound();
+            checkAndFinalizeRound(scores);
             savePontinho();
             render();
         }
@@ -1820,12 +1820,21 @@
             }
         }
 
-        function checkAndFinalizeRound() {
-            // Check winner - game ends when only 1 player has 0 wheels (and hasn't given up)
-            const playersWithoutWheels = pontinhoData.players.filter(p => !p.gaveUp && p.wheels === 0);
+        function checkAndFinalizeRound(scores) {
+            // Check winner - game ends when in THIS ROUND:
+            // - Exactly 1 active player did NOT get a wheel
+            // - ALL other active players DID get a wheel
 
-            if (playersWithoutWheels.length === 1) {
-                const winnerIndex = pontinhoData.players.findIndex(p => !p.gaveUp && p.wheels === 0);
+            const activePlayers = pontinhoData.players
+                .map((p, i) => ({ player: p, index: i, gotWheel: scores[i]?.gotWheel || false }))
+                .filter(item => !item.player.eliminated && !item.player.gaveUp);
+
+            const playersWithoutWheelThisRound = activePlayers.filter(item => !item.gotWheel);
+            const playersWithWheelThisRound = activePlayers.filter(item => item.gotWheel);
+
+            // Game ends if exactly 1 player didn't get wheel AND all others did
+            if (playersWithoutWheelThisRound.length === 1 && playersWithWheelThisRound.length === activePlayers.length - 1) {
+                const winnerIndex = playersWithoutWheelThisRound[0].index;
                 pontinhoData.gameOver = true;
                 pontinhoData.winner = winnerIndex;
 
@@ -2018,11 +2027,17 @@
                 // Process wheels
                 processWheels(round.scores);
 
-                // Check winner - game ends when only 1 player has 0 wheels
-                const playersWithoutWheels = pontinhoData.players.filter(p => p.wheels === 0 && !p.gaveUp);
+                // Check winner - game ends when in this round:
+                // 1 player didn't get wheel AND all others did
+                const activePlayers = pontinhoData.players
+                    .map((p, i) => ({ player: p, index: i, gotWheel: round.scores[i]?.gotWheel || false }))
+                    .filter(item => !item.player.eliminated && !item.player.gaveUp);
 
-                if (playersWithoutWheels.length === 1) {
-                    const winnerIndex = pontinhoData.players.findIndex(p => p.wheels === 0 && !p.gaveUp);
+                const playersWithoutWheelThisRound = activePlayers.filter(item => !item.gotWheel);
+                const playersWithWheelThisRound = activePlayers.filter(item => item.gotWheel);
+
+                if (playersWithoutWheelThisRound.length === 1 && playersWithWheelThisRound.length === activePlayers.length - 1) {
+                    const winnerIndex = playersWithoutWheelThisRound[0].index;
                     pontinhoData.gameOver = true;
                     pontinhoData.winner = winnerIndex;
 

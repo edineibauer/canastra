@@ -148,9 +148,68 @@
             justify-content: center;
         }
 
-        .btn-settings:hover { 
-            border-color: rgba(255,255,255,0.4); 
-            color: #fff; 
+        .btn-settings:hover {
+            border-color: rgba(255,255,255,0.4);
+            color: #fff;
+        }
+
+        .btn-history {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            color: #666;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-history:hover {
+            border-color: rgba(255,255,255,0.4);
+            color: #fff;
+        }
+
+        .btn-history.has-history {
+            border-color: rgba(46, 204, 113, 0.4);
+            color: #2ecc71;
+        }
+
+        .finished-games-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .finished-game-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .finished-game-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .finished-game-date {
+            font-size: 0.65rem;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .finished-game-info {
+            font-size: 0.85rem;
+            color: #fff;
+        }
+
+        .finished-game-winner {
+            color: #2ecc71;
+            font-weight: 700;
         }
 
         .scoreboard {
@@ -1087,6 +1146,15 @@
         let tempCachetaPlayerCount = 4;
         let tempJogo7PlayerCount = 4;
 
+        // Finished games history (up to 5 per game type)
+        let finishedGames = {
+            canastra: [],
+            pontinho: [],
+            cacheta: [],
+            jogo7: [],
+            truco: []
+        };
+
         // Load games
         function loadGames() {
             const savedCanastra = localStorage.getItem('canastra_game');
@@ -1115,6 +1183,27 @@
                 const parsed = JSON.parse(savedTruco);
                 trucoData = { ...trucoData, ...parsed };
             }
+
+            // Load finished games history
+            const savedFinishedGames = localStorage.getItem('finished_games');
+            if (savedFinishedGames) {
+                finishedGames = JSON.parse(savedFinishedGames);
+            }
+        }
+
+        function saveFinishedGames() {
+            localStorage.setItem('finished_games', JSON.stringify(finishedGames));
+        }
+
+        function addToFinishedGames(gameType, gameData) {
+            const copy = JSON.parse(JSON.stringify(gameData));
+            copy.finishedAt = new Date().toISOString();
+            finishedGames[gameType].unshift(copy);
+            // Keep only last 5 games
+            if (finishedGames[gameType].length > 5) {
+                finishedGames[gameType] = finishedGames[gameType].slice(0, 5);
+            }
+            saveFinishedGames();
         }
 
         function saveCanastra() {
@@ -1199,6 +1288,7 @@
                     </div>
                     <div class="target-row">
                         <span class="target">Primeiro a ${canastraData.targetScore} pontos</span>
+                        <button class="btn-history ${finishedGames.canastra.length > 0 ? 'has-history' : ''}" onclick="openFinishedGames('canastra')">📋</button>
                         <button class="btn-settings" onclick="openCanastraSettings()">⚙️</button>
                     </div>
                 </div>
@@ -1399,13 +1489,18 @@
         }
 
         function resetCanastra() {
-            canastraData = { 
-                ...canastraData, 
-                nos: 0, 
-                eles: 0, 
-                history: [], 
-                gameOver: false, 
-                winner: null 
+            // Save to finished games if game was completed
+            if (canastraData.gameOver && canastraData.history.length > 0) {
+                addToFinishedGames('canastra', canastraData);
+            }
+
+            canastraData = {
+                ...canastraData,
+                nos: 0,
+                eles: 0,
+                history: [],
+                gameOver: false,
+                winner: null
             };
             saveCanastra();
             render();
@@ -1540,6 +1635,7 @@
                     </div>
                     <div class="target-row">
                         <span class="target">${activePlayers.length} jogador${activePlayers.length !== 1 ? 'es' : ''} ativo${activePlayers.length !== 1 ? 's' : ''}</span>
+                        <button class="btn-history ${finishedGames.pontinho.length > 0 ? 'has-history' : ''}" onclick="openFinishedGames('pontinho')">📋</button>
                         ${!pontinhoData.gameOver ? '<button class="btn-add-player" onclick="openAddPontinhoPlayer()">+ Jogador</button>' : ''}
                     </div>
                 </div>
@@ -1687,7 +1783,7 @@
             closeModal();
 
             // Check and finalize round
-            checkAndFinalizeRound(zeroCount);
+            checkAndFinalizeRound();
             savePontinho();
             render();
         }
@@ -1705,6 +1801,14 @@
                         // Got a wheel!
                         player.wheels++;
                         scores[i].gotWheel = true;
+
+                        // Check if player is eliminated (3 wheels)
+                        if (player.wheels >= 3) {
+                            player.eliminated = true;
+                            player.score = 0;
+                            changed = true;
+                            continue;
+                        }
 
                         // Find the highest score below 100 among active players
                         const validScores = pontinhoData.players
@@ -1724,33 +1828,18 @@
             }
         }
 
-        function checkAndFinalizeRound(zeroCount) {
-            // Check winner - só finaliza se tiver apenas 1 jogador sem rodinha E a rodada teve apenas 1 vencedor
-            const playersWithoutWheels = pontinhoData.players.filter(p => p.wheels === 0 && !p.gaveUp);
+        function checkAndFinalizeRound() {
+            // Check winner - game ends when only 1 active player remains
             const activePlayers = pontinhoData.players.filter(p => !p.eliminated && !p.gaveUp);
 
-            if (playersWithoutWheels.length === 1 && zeroCount === 1) {
-                // Jogo finaliza - o jogador sem rodinha vence
-                const winnerIndex = pontinhoData.players.findIndex(p => p.wheels === 0 && !p.gaveUp);
-                pontinhoData.gameOver = true;
-                pontinhoData.winner = winnerIndex;
-
-                pontinhoData.players.forEach((p, i) => {
-                    if (i !== winnerIndex) {
-                        p.eliminated = true;
-                    }
-                });
-            } else if (activePlayers.length === 1) {
-                // Only one active player left, they win
+            if (activePlayers.length === 1) {
                 const winnerIndex = pontinhoData.players.findIndex(p => !p.eliminated && !p.gaveUp);
                 pontinhoData.gameOver = true;
                 pontinhoData.winner = winnerIndex;
-
-                pontinhoData.players.forEach((p, i) => {
-                    if (i !== winnerIndex) {
-                        p.eliminated = true;
-                    }
-                });
+            } else if (activePlayers.length === 0) {
+                // Edge case: all players eliminated simultaneously
+                pontinhoData.gameOver = true;
+                pontinhoData.winner = null;
             }
         }
 
@@ -1972,22 +2061,49 @@
         }
 
         function resetPontinho() {
-            pontinhoData = {
-                players: [],
-                history: [],
-                gameOver: false,
-                winner: null,
-                setup: true
-            };
-            tempPlayerCount = 4;
+            // Save to finished games if game was completed
+            if (pontinhoData.gameOver && pontinhoData.players.length > 0) {
+                addToFinishedGames('pontinho', pontinhoData);
+            }
+
+            // Keep player names for new game
+            const playerNames = pontinhoData.players.map(p => p.name);
+
+            if (playerNames.length > 0) {
+                // Reset with same players
+                pontinhoData = {
+                    players: playerNames.map(name => ({
+                        name,
+                        score: 0,
+                        wheels: 0,
+                        eliminated: false,
+                        gaveUp: false
+                    })),
+                    history: [],
+                    gameOver: false,
+                    winner: null,
+                    setup: false
+                };
+            } else {
+                // Fresh start
+                pontinhoData = {
+                    players: [],
+                    history: [],
+                    gameOver: false,
+                    winner: null,
+                    setup: true
+                };
+                tempPlayerCount = 4;
+            }
+
             savePontinho();
-            
+
             // Remove winner overlay
             const overlay = document.getElementById('winnerOverlay');
             if (overlay) {
                 overlay.classList.remove('active');
             }
-            
+
             render();
         }
 
@@ -2123,6 +2239,7 @@
                     </div>
                     <div class="target-row">
                         <span class="target">${activePlayers.length} jogador${activePlayers.length !== 1 ? 'es' : ''} ativo${activePlayers.length !== 1 ? 's' : ''}</span>
+                        <button class="btn-history ${finishedGames.cacheta.length > 0 ? 'has-history' : ''}" onclick="openFinishedGames('cacheta')">📋</button>
                         ${!cachetaData.gameOver ? '<button class="btn-add-player" onclick="openAddCachetaPlayer()">+ Jogador</button>' : ''}
                     </div>
                 </div>
@@ -2493,15 +2610,42 @@
         }
 
         function resetCacheta() {
-            cachetaData = {
-                ...cachetaData,
-                players: [],
-                history: [],
-                gameOver: false,
-                winner: null,
-                setup: true
-            };
-            tempCachetaPlayerCount = 4;
+            // Save to finished games if game was completed
+            if (cachetaData.gameOver && cachetaData.players.length > 0) {
+                addToFinishedGames('cacheta', cachetaData);
+            }
+
+            // Keep player names for new game
+            const playerNames = cachetaData.players.map(p => p.name);
+
+            if (playerNames.length > 0) {
+                // Reset with same players
+                cachetaData = {
+                    ...cachetaData,
+                    players: playerNames.map(name => ({
+                        name,
+                        score: cachetaData.initialScore,
+                        eliminated: false,
+                        gaveUp: false
+                    })),
+                    history: [],
+                    gameOver: false,
+                    winner: null,
+                    setup: false
+                };
+            } else {
+                // Fresh start
+                cachetaData = {
+                    ...cachetaData,
+                    players: [],
+                    history: [],
+                    gameOver: false,
+                    winner: null,
+                    setup: true
+                };
+                tempCachetaPlayerCount = 4;
+            }
+
             saveCacheta();
 
             // Remove winner overlay
@@ -2655,6 +2799,7 @@
                     </div>
                     <div class="target-row">
                         <span class="target">${activePlayers.length} jogador${activePlayers.length !== 1 ? 'es' : ''} ativo${activePlayers.length !== 1 ? 's' : ''}</span>
+                        <button class="btn-history ${finishedGames.jogo7.length > 0 ? 'has-history' : ''}" onclick="openFinishedGames('jogo7')">📋</button>
                     </div>
                 </div>
 
@@ -2850,15 +2995,42 @@
         }
 
         function resetJogo7() {
-            jogo7Data = {
-                ...jogo7Data,
-                players: [],
-                pote: 0,
-                gameOver: false,
-                winner: null,
-                setup: true
-            };
-            tempJogo7PlayerCount = 4;
+            // Save to finished games if game was completed
+            if (jogo7Data.gameOver && jogo7Data.players.length > 0) {
+                addToFinishedGames('jogo7', jogo7Data);
+            }
+
+            // Keep player names for new game
+            const playerNames = jogo7Data.players.map(p => p.name);
+
+            if (playerNames.length > 0) {
+                // Reset with same players
+                jogo7Data = {
+                    ...jogo7Data,
+                    players: playerNames.map(name => ({
+                        name,
+                        score: jogo7Data.initialScore,
+                        defeats: 0,
+                        gaveUp: false
+                    })),
+                    pote: 0,
+                    gameOver: false,
+                    winner: null,
+                    setup: false
+                };
+            } else {
+                // Fresh start
+                jogo7Data = {
+                    ...jogo7Data,
+                    players: [],
+                    pote: 0,
+                    gameOver: false,
+                    winner: null,
+                    setup: true
+                };
+                tempJogo7PlayerCount = 4;
+            }
+
             saveJogo7();
 
             // Remove winner overlay
@@ -2912,6 +3084,7 @@
                     </div>
                     <div class="target-row">
                         <span class="target">Primeiro a ${trucoData.targetScore} pontos</span>
+                        <button class="btn-history ${finishedGames.truco.length > 0 ? 'has-history' : ''}" onclick="openFinishedGames('truco')">📋</button>
                         <button class="btn-settings" onclick="openTrucoSettings()">⚙️</button>
                     </div>
                 </div>
@@ -3126,6 +3299,11 @@
         }
 
         function resetTruco() {
+            // Save to finished games if game was completed
+            if (trucoData.gameOver && trucoData.history.length > 0) {
+                addToFinishedGames('truco', trucoData);
+            }
+
             trucoData = {
                 ...trucoData,
                 nos: 0,
@@ -3135,6 +3313,97 @@
                 winner: null
             };
             saveTruco();
+            render();
+        }
+
+        // ============================================
+        // FINISHED GAMES HISTORY
+        // ============================================
+
+        function openFinishedGames(gameType) {
+            const games = finishedGames[gameType] || [];
+            if (games.length === 0) {
+                showModal(`
+                    <h2 class="modal-title">JOGOS ANTERIORES</h2>
+                    <p style="text-align:center;color:#888;padding:20px;">Nenhum jogo finalizado ainda.</p>
+                    <div class="modal-actions">
+                        <button class="btn-cancel" onclick="closeModal()">Fechar</button>
+                    </div>
+                `);
+                return;
+            }
+
+            const gamesHTML = games.map((game, index) => {
+                const date = new Date(game.finishedAt);
+                const dateStr = date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+                let info = '';
+
+                if (gameType === 'canastra' || gameType === 'truco') {
+                    const winnerName = game.winner === 'nos' ? 'Nós' : 'Eles';
+                    info = `<span class="finished-game-winner">${winnerName}</span> venceu (${game.nos} × ${game.eles})`;
+                } else {
+                    const winner = game.players[game.winner];
+                    const winnerName = winner ? winner.name : 'N/A';
+                    info = `<span class="finished-game-winner">${winnerName}</span> venceu`;
+                }
+
+                return `
+                    <div class="finished-game-item" onclick="restoreFinishedGame('${gameType}', ${index})">
+                        <div class="finished-game-date">${dateStr}</div>
+                        <div class="finished-game-info">${info}</div>
+                    </div>
+                `;
+            }).join('');
+
+            showModal(`
+                <h2 class="modal-title">JOGOS ANTERIORES</h2>
+                <div class="finished-games-list">${gamesHTML}</div>
+                <div class="modal-actions" style="margin-top:16px;">
+                    <button class="btn-cancel" onclick="closeModal()">Fechar</button>
+                </div>
+            `);
+        }
+
+        function restoreFinishedGame(gameType, index) {
+            const game = finishedGames[gameType][index];
+            if (!game) return;
+
+            if (!confirm('Restaurar este jogo? O jogo atual será substituído.')) return;
+
+            // Remove winner overlay first
+            const overlay = document.getElementById('winnerOverlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
+
+            switch (gameType) {
+                case 'canastra':
+                    canastraData = { ...canastraData, ...game };
+                    saveCanastra();
+                    break;
+                case 'pontinho':
+                    pontinhoData = { ...game };
+                    savePontinho();
+                    break;
+                case 'cacheta':
+                    cachetaData = { ...cachetaData, ...game };
+                    saveCacheta();
+                    break;
+                case 'jogo7':
+                    jogo7Data = { ...jogo7Data, ...game };
+                    saveJogo7();
+                    break;
+                case 'truco':
+                    trucoData = { ...trucoData, ...game };
+                    saveTruco();
+                    break;
+            }
+
+            // Remove from finished games after restore
+            finishedGames[gameType].splice(index, 1);
+            saveFinishedGames();
+
+            closeModal();
             render();
         }
 

@@ -1489,8 +1489,8 @@
         }
 
         function resetCanastra() {
-            // Save to finished games if game was completed
-            if (canastraData.gameOver && canastraData.history.length > 0) {
+            // Save current game to history (even if not finished) - works like save slots
+            if (canastraData.history.length > 0) {
                 addToFinishedGames('canastra', canastraData);
             }
 
@@ -2059,8 +2059,8 @@
         }
 
         function resetPontinho() {
-            // Save to finished games if game was completed
-            if (pontinhoData.gameOver && pontinhoData.players.length > 0) {
+            // Save current game to history (even if not finished) - works like save slots
+            if (pontinhoData.players.length > 0 && pontinhoData.history.length > 0) {
                 addToFinishedGames('pontinho', pontinhoData);
             }
 
@@ -2608,8 +2608,8 @@
         }
 
         function resetCacheta() {
-            // Save to finished games if game was completed
-            if (cachetaData.gameOver && cachetaData.players.length > 0) {
+            // Save current game to history (even if not finished) - works like save slots
+            if (cachetaData.players.length > 0 && cachetaData.history.length > 0) {
                 addToFinishedGames('cacheta', cachetaData);
             }
 
@@ -2993,8 +2993,8 @@
         }
 
         function resetJogo7() {
-            // Save to finished games if game was completed
-            if (jogo7Data.gameOver && jogo7Data.players.length > 0) {
+            // Save current game to history (even if not finished) - works like save slots
+            if (jogo7Data.players.length > 0 && jogo7Data.history.length > 0) {
                 addToFinishedGames('jogo7', jogo7Data);
             }
 
@@ -3297,8 +3297,8 @@
         }
 
         function resetTruco() {
-            // Save to finished games if game was completed
-            if (trucoData.gameOver && trucoData.history.length > 0) {
+            // Save current game to history (even if not finished) - works like save slots
+            if (trucoData.history.length > 0) {
                 addToFinishedGames('truco', trucoData);
             }
 
@@ -3322,8 +3322,8 @@
             const games = finishedGames[gameType] || [];
             if (games.length === 0) {
                 showModal(`
-                    <h2 class="modal-title">JOGOS ANTERIORES</h2>
-                    <p style="text-align:center;color:#888;padding:20px;">Nenhum jogo finalizado ainda.</p>
+                    <h2 class="modal-title">JOGOS SALVOS</h2>
+                    <p style="text-align:center;color:#888;padding:20px;">Nenhum jogo salvo ainda.</p>
                     <div class="modal-actions">
                         <button class="btn-cancel" onclick="closeModal()">Fechar</button>
                     </div>
@@ -3335,26 +3335,40 @@
                 const date = new Date(game.finishedAt);
                 const dateStr = date.toLocaleDateString('pt-BR') + ' ' + date.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
                 let info = '';
+                const isFinished = game.gameOver === true;
+                const statusBadge = isFinished
+                    ? '<span style="background:#4CAF50;color:white;padding:2px 6px;border-radius:4px;font-size:10px;margin-left:8px;">FINALIZADO</span>'
+                    : '<span style="background:#FF9800;color:white;padding:2px 6px;border-radius:4px;font-size:10px;margin-left:8px;">EM ANDAMENTO</span>';
 
                 if (gameType === 'canastra' || gameType === 'truco') {
-                    const winnerName = game.winner === 'nos' ? 'Nós' : 'Eles';
-                    info = `<span class="finished-game-winner">${winnerName}</span> venceu (${game.nos} × ${game.eles})`;
+                    if (isFinished && game.winner) {
+                        const winnerName = game.winner === 'nos' ? 'Nós' : 'Eles';
+                        info = `<span class="finished-game-winner">${winnerName}</span> venceu (${game.nos} × ${game.eles})`;
+                    } else {
+                        info = `Placar: ${game.nos} × ${game.eles}`;
+                    }
                 } else {
-                    const winner = game.players[game.winner];
-                    const winnerName = winner ? winner.name : 'N/A';
-                    info = `<span class="finished-game-winner">${winnerName}</span> venceu`;
+                    if (isFinished && game.winner !== null && game.winner !== undefined) {
+                        const winner = game.players[game.winner];
+                        const winnerName = winner ? winner.name : 'N/A';
+                        info = `<span class="finished-game-winner">${winnerName}</span> venceu`;
+                    } else {
+                        const playerNames = game.players.map(p => p.name).slice(0, 3).join(', ');
+                        const more = game.players.length > 3 ? '...' : '';
+                        info = `${playerNames}${more}`;
+                    }
                 }
 
                 return `
                     <div class="finished-game-item" onclick="restoreFinishedGame('${gameType}', ${index})">
-                        <div class="finished-game-date">${dateStr}</div>
+                        <div class="finished-game-date">${dateStr}${statusBadge}</div>
                         <div class="finished-game-info">${info}</div>
                     </div>
                 `;
             }).join('');
 
             showModal(`
-                <h2 class="modal-title">JOGOS ANTERIORES</h2>
+                <h2 class="modal-title">JOGOS SALVOS</h2>
                 <div class="finished-games-list">${gamesHTML}</div>
                 <div class="modal-actions" style="margin-top:16px;">
                     <button class="btn-cancel" onclick="closeModal()">Fechar</button>

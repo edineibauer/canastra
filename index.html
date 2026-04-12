@@ -1651,7 +1651,10 @@
                 <div class="history-section">
                     <div class="history-title">
                         HISTÓRICO
-                        ${pontinhoData.history.length > 0 ? '<button class="btn-reset" onclick="confirmPontinhoReset()">NOVO JOGO</button>' : ''}
+                        <div style="display:flex;gap:6px;">
+                            <button class="btn-reset" style="background:rgba(52,152,219,0.2);border-color:rgba(52,152,219,0.4);color:#3498db;" onclick="goToPontinhoSetup()">JOGADORES</button>
+                            ${pontinhoData.history.length > 0 ? '<button class="btn-reset" onclick="confirmPontinhoReset()">NOVO JOGO</button>' : ''}
+                        </div>
                     </div>
                     <div class="history-list">${historyHTML}</div>
                 </div>
@@ -1756,13 +1759,6 @@
                     zeroPlayerIndex = i;
                 }
                 scores.push({ points, gotWheel: false });
-            }
-
-            // Deve ter ao menos um jogador com 0 pontos
-            const activePlayers = pontinhoData.players.filter(p => !p.eliminated && !p.gaveUp);
-            if (zeroCount === 0 && activePlayers.length > 0) {
-                alert('Ao menos um jogador deve fazer 0 pontos (vencedor da rodada)!');
-                return;
             }
 
             // Apply scores
@@ -2054,6 +2050,27 @@
             render();
         }
 
+        function goToPontinhoSetup() {
+            if (pontinhoData.history.length > 0) {
+                if (!confirm('Voltar ao setup? O jogo atual será salvo no histórico.')) return;
+                addToFinishedGames('pontinho', pontinhoData);
+            }
+
+            // Set player count from current players
+            tempPlayerCount = Math.max(2, pontinhoData.players.length || 4);
+
+            pontinhoData = {
+                players: [],
+                history: [],
+                gameOver: false,
+                winner: null,
+                setup: true
+            };
+
+            savePontinho();
+            render();
+        }
+
         function confirmPontinhoReset() {
             if (confirm('Iniciar novo jogo?')) resetPontinho();
         }
@@ -2253,7 +2270,10 @@
                 <div class="history-section">
                     <div class="history-title">
                         HISTÓRICO
-                        ${cachetaData.history.length > 0 ? '<button class="btn-reset" onclick="confirmCachetaReset()">NOVO JOGO</button>' : ''}
+                        <div style="display:flex;gap:6px;">
+                            <button class="btn-reset" style="background:rgba(155,89,182,0.2);border-color:rgba(155,89,182,0.4);color:#9b59b6;" onclick="goToCachetaSetup()">JOGADORES</button>
+                            ${cachetaData.history.length > 0 ? '<button class="btn-reset" onclick="confirmCachetaReset()">NOVO JOGO</button>' : ''}
+                        </div>
                     </div>
                     <div class="history-list">${historyHTML}</div>
                 </div>
@@ -2603,6 +2623,27 @@
             render();
         }
 
+        function goToCachetaSetup() {
+            if (cachetaData.history.length > 0) {
+                if (!confirm('Voltar ao setup? O jogo atual será salvo no histórico.')) return;
+                addToFinishedGames('cacheta', cachetaData);
+            }
+
+            tempCachetaPlayerCount = Math.max(2, cachetaData.players.length || 4);
+
+            cachetaData = {
+                ...cachetaData,
+                players: [],
+                history: [],
+                gameOver: false,
+                winner: null,
+                setup: true
+            };
+
+            saveCacheta();
+            render();
+        }
+
         function confirmCachetaReset() {
             if (confirm('Iniciar novo jogo?')) resetCacheta();
         }
@@ -2815,7 +2856,10 @@
                 <div class="history-section">
                     <div class="history-title">
                         OPÇÕES
-                        <button class="btn-reset" onclick="confirmJogo7Reset()">NOVO JOGO</button>
+                        <div style="display:flex;gap:6px;">
+                            <button class="btn-reset" style="background:rgba(26,188,156,0.2);border-color:rgba(26,188,156,0.4);color:#1abc9c;" onclick="goToJogo7Setup()">JOGADORES</button>
+                            <button class="btn-reset" onclick="confirmJogo7Reset()">NOVO JOGO</button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -2985,6 +3029,29 @@
                 saveJogo7();
             }
             closeModal();
+            render();
+        }
+
+        function goToJogo7Setup() {
+            if (jogo7Data.players.length > 0) {
+                if (!confirm('Voltar ao setup? O jogo atual será salvo no histórico.')) return;
+                if (jogo7Data.history && jogo7Data.history.length > 0) {
+                    addToFinishedGames('jogo7', jogo7Data);
+                }
+            }
+
+            tempJogo7PlayerCount = Math.max(2, jogo7Data.players.length || 4);
+
+            jogo7Data = {
+                ...jogo7Data,
+                players: [],
+                pote: 0,
+                gameOver: false,
+                winner: null,
+                setup: true
+            };
+
+            saveJogo7();
             render();
         }
 

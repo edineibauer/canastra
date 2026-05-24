@@ -961,6 +961,12 @@
             background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
         }
 
+        .btn-choice.remove {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(231, 76, 60, 0.45);
+            color: #e74c3c;
+        }
+
         /* Final ranking */
         .final-ranking {
             background: rgba(255,255,255,0.05);
@@ -1866,6 +1872,10 @@
                 ? ''
                 : `<button class="btn-choice give-up" onclick="pontinhoPlayerGiveUp(${playerIndex})">Parar de jogar (desistir)</button>`;
 
+            const removeButton = pontinhoData.players.length > 2
+                ? `<button class="btn-choice remove" onclick="pontinhoPlayerRemove(${playerIndex})">🗑️ Remover do jogo</button>`
+                : '';
+
             showModal(`
                 <h2 class="modal-title">${player.name.toUpperCase()}</h2>
                 <p style="text-align:center;color:#888;margin-bottom:16px;">
@@ -1879,12 +1889,38 @@
                 <div class="wheel-choice-options">
                     <button class="btn-choice continue" onclick="savePontinhoPlayerName(${playerIndex})">Salvar nome</button>
                     ${gaveUpButton}
+                    ${removeButton}
                 </div>
                 <div class="modal-actions" style="margin-top:12px;">
                     <button class="btn-cancel" onclick="closeModal()">Fechar</button>
                 </div>
             `);
             setTimeout(() => document.getElementById('editPlayerName').focus(), 100);
+        }
+
+        function pontinhoPlayerRemove(playerIndex) {
+            if (pontinhoData.players.length <= 2) return;
+            const player = pontinhoData.players[playerIndex];
+            if (!player) return;
+            if (!confirm(`Remover "${player.name}" do jogo?\nAs pontuações desse jogador serão apagadas do histórico desta partida.`)) return;
+
+            pontinhoData.players.splice(playerIndex, 1);
+            pontinhoData.history.forEach(round => {
+                if (Array.isArray(round.scores) && round.scores.length > playerIndex) {
+                    round.scores.splice(playerIndex, 1);
+                }
+            });
+            if (pontinhoData.winner !== null && pontinhoData.winner !== undefined) {
+                if (pontinhoData.winner === playerIndex) {
+                    pontinhoData.winner = null;
+                    pontinhoData.gameOver = false;
+                } else if (pontinhoData.winner > playerIndex) {
+                    pontinhoData.winner -= 1;
+                }
+            }
+
+            closeModal();
+            recalculatePontinho();
         }
 
         function savePontinhoPlayerName(playerIndex) {
@@ -2456,6 +2492,10 @@
             const player = cachetaData.players[playerIndex];
             if (player.eliminated) return;
 
+            const removeButton = cachetaData.players.length > 2
+                ? `<button class="btn-choice remove" onclick="cachetaPlayerRemove(${playerIndex})">🗑️ Remover do jogo</button>`
+                : '';
+
             showModal(`
                 <h2 class="modal-title">${player.name.toUpperCase()}</h2>
                 <p style="text-align:center;color:#888;margin-bottom:16px;">
@@ -2468,12 +2508,38 @@
                 <div class="wheel-choice-options">
                     <button class="btn-choice continue" onclick="saveCachetaPlayerName(${playerIndex})">Salvar nome</button>
                     <button class="btn-choice give-up" onclick="cachetaPlayerGiveUp(${playerIndex})">Parar de jogar (desistir)</button>
+                    ${removeButton}
                 </div>
                 <div class="modal-actions" style="margin-top:12px;">
                     <button class="btn-cancel" onclick="closeModal()">Fechar</button>
                 </div>
             `);
             setTimeout(() => document.getElementById('editCachetaPlayerName').focus(), 100);
+        }
+
+        function cachetaPlayerRemove(playerIndex) {
+            if (cachetaData.players.length <= 2) return;
+            const player = cachetaData.players[playerIndex];
+            if (!player) return;
+            if (!confirm(`Remover "${player.name}" do jogo?\nAs ações desse jogador serão apagadas do histórico desta partida.`)) return;
+
+            cachetaData.players.splice(playerIndex, 1);
+            cachetaData.history.forEach(round => {
+                if (Array.isArray(round.actions) && round.actions.length > playerIndex) {
+                    round.actions.splice(playerIndex, 1);
+                }
+            });
+            if (cachetaData.winner !== null && cachetaData.winner !== undefined) {
+                if (cachetaData.winner === playerIndex) {
+                    cachetaData.winner = null;
+                    cachetaData.gameOver = false;
+                } else if (cachetaData.winner > playerIndex) {
+                    cachetaData.winner -= 1;
+                }
+            }
+
+            closeModal();
+            recalculateCacheta();
         }
 
         function saveCachetaPlayerName(playerIndex) {
@@ -3003,6 +3069,10 @@
             const player = jogo7Data.players[playerIndex];
             if (player.gaveUp) return;
 
+            const removeButton = jogo7Data.players.length > 2
+                ? `<button class="btn-choice remove" onclick="jogo7PlayerRemove(${playerIndex})">🗑️ Remover do jogo</button>`
+                : '';
+
             showModal(`
                 <h2 class="modal-title">${player.name.toUpperCase()}</h2>
                 <p style="text-align:center;color:#888;margin-bottom:16px;">
@@ -3014,12 +3084,41 @@
                 </div>
                 <div class="wheel-choice-options">
                     <button class="btn-choice continue" onclick="saveJogo7PlayerName(${playerIndex})">Salvar nome</button>
+                    ${removeButton}
                 </div>
                 <div class="modal-actions" style="margin-top:12px;">
                     <button class="btn-cancel" onclick="closeModal()">Fechar</button>
                 </div>
             `);
             setTimeout(() => document.getElementById('editJogo7PlayerName').focus(), 100);
+        }
+
+        function jogo7PlayerRemove(playerIndex) {
+            if (jogo7Data.players.length <= 2) return;
+            const player = jogo7Data.players[playerIndex];
+            if (!player) return;
+            if (!confirm(`Remover "${player.name}" do jogo?`)) return;
+
+            jogo7Data.players.splice(playerIndex, 1);
+            if (jogo7Data.winner !== null && jogo7Data.winner !== undefined) {
+                if (jogo7Data.winner === playerIndex) {
+                    jogo7Data.winner = null;
+                    jogo7Data.gameOver = false;
+                } else if (jogo7Data.winner > playerIndex) {
+                    jogo7Data.winner -= 1;
+                }
+            }
+
+            const activePlayers = jogo7Data.players.filter(p => !p.gaveUp);
+            if (activePlayers.length === 1) {
+                const winnerIdx = jogo7Data.players.findIndex(p => !p.gaveUp);
+                jogo7Data.gameOver = true;
+                jogo7Data.winner = winnerIdx;
+            }
+
+            saveJogo7();
+            closeModal();
+            render();
         }
 
         function saveJogo7PlayerName(playerIndex) {

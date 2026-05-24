@@ -1,4 +1,4 @@
-const CACHE_NAME = 'canastra-v2';
+const CACHE_NAME = 'canastra-v3';
 const urlsToCache = [
   './',
   './index.html',
